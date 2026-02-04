@@ -15,6 +15,7 @@
 #include "Memory.h"
 #include "String.h"
 #include "Message.h"
+#include "score_left.h"
 
 #include "resource.h"
 
