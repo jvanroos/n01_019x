@@ -53,3 +53,11 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Pelles C ide files
+*.ppj
+*.ppx
+*.tag
+
+#output files
+/output
