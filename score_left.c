@@ -235,6 +235,18 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 				break;
 			}			
 			bf->font_size = lParam;
+
+
+			// FONT opnieuw maken en toepassen
+			draw_init(hWnd, bf);
+
+			// SCORE opnieuw tekenen
+			draw_score(hWnd, bf);
+
+			// venster laten refreshen
+			InvalidateRect(hWnd, NULL, TRUE);
+			UpdateWindow(hWnd);
+
 			break;
 
 		case WM_PAINT:
