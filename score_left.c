@@ -15,6 +15,7 @@
 #include "Memory.h"
 #include "String.h"
 #include "Message.h"
+#include "font.h"
 #include "score_left.h"
 
 #include "resource.h"
@@ -68,11 +69,29 @@ static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf)
 }
 
 /*
- * draw_score - ????????
+ * draw_score
  */
 static BOOL draw_score(const HWND hWnd, const DRAW_BUFFER *bf)
 {
+	RECT rect;
+	SIZE sz;
+	TCHAR buf[BUF_SIZE];
+	int len;
 
+	GetClientRect(hWnd, &rect);
+	FillRect(bf->draw_dc, &rect, bf->back_brush);
+
+	_itot(bf->pi->left, buf, 10);
+	len = lstrlen(buf);
+	GetTextExtentPoint32(bf->draw_dc, buf, len, &sz);
+	TextOut(bf->draw_dc,
+		rect.left + (rect.right - rect.left - sz.cx) / 2,
+		rect.top + (rect.bottom - rect.top - sz.cy) / 2,
+		buf, len);
+
+	if (bf->current == TRUE) {
+		FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
+	}
 	return TRUE;
 }
 
@@ -81,7 +100,39 @@ static BOOL draw_score(const HWND hWnd, const DRAW_BUFFER *bf)
  */
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 {
+	HDC hdc;
+	HRGN hrgn[2];
+	RECT rect, del_rect;
 
+	GetClientRect(hWnd, &rect);
+
+	hdc = GetDC(hWnd);
+	bf->draw_bmp = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
+	bf->draw_ret_bmp = SelectObject(bf->draw_dc, bf->draw_bmp);
+	ReleaseDC(hWnd, hdc);
+
+	if (op.left_font_size == 0) {
+		op.left_font_size = 40;
+	}
+
+	if (bf->font_size <= 0) {
+		bf->font_size = ((rect.right / op.left_font_size) * 10 > rect.bottom) ?
+			rect.bottom : (rect.right / op.left_font_size) * 10;
+	}
+	bf->score_font = font_create(op.font_name, bf->font_size, FW_BOLD, FALSE, FALSE);
+	bf->ret_font = SelectObject(bf->draw_dc, bf->score_font);
+
+	SetTextColor(bf->draw_dc, RGB(0, 0, 255)); // TODO: change RGB(0, 0, 255) to op.ci.left_text;
+	SetBkColor(bf->draw_dc, RGB(255, 255, 255)); // TODO: change RGB(255, 255, 255) to op.ci.left_background;
+	
+	hrgn[0] = CreateRectRgnIndirect(&rect);
+	SetRect(&del_rect, rect.bottom / BORDER_SIZE, rect.bottom / BORDER_SIZE,
+		rect.right - rect.bottom / BORDER_SIZE, rect.bottom - rect.bottom / BORDER_SIZE);
+	hrgn[1] = CreateRectRgnIndirect(&rect);
+	bf->hrgn = CreateRectRgnIndirect(&rect);
+	CombineRgn(bf->hrgn, hrgn[0], hrgn[1], RGN_DIFF);
+	DeleteObject(hrgn[0]);
+	DeleteObject(hrgn[1]);
 	return TRUE;
 }
 
@@ -130,12 +181,24 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
 			break;
 
+		case WM_PAINT:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			hdc = BeginPaint(hWnd, &ps);
+			BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom,
+				bf->draw_dc, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
+
+			EndPaint(hWnd, &ps);
+			break;
+
 		case WM_CLOSE:
 			DestroyWindow(hWnd);
 			break;
 
 		case WM_DESTROY:
-			bf = (DRAW_BUFFER*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf != NULL) {
 				draw_free(hWnd, bf);
 				if (bf->draw_dc != NULL) {

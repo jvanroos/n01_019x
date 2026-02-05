@@ -6,6 +6,7 @@
 #include "ini.h"
 #include "memory.h"
 #include "message.h"
+#include "score_left.h"
 #include "resource.h"
 
 /* Define */
@@ -17,6 +18,7 @@
 HINSTANCE hInst;
 
 OPTION_INFO 	op;					// defined in general.h
+SCORE_INFO		si;
 
 TCHAR work_path[MAX_PATH];
 TCHAR ini_path[MAX_PATH];
@@ -41,9 +43,19 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 {
 	static WINDOW_INFO wi;
 
+	RECT rect;
+	int left, right;
+	int left_height, guide_height;
+
+
 	switch (msg) {
 		case WM_CREATE:
 			wi.hWnd = hWnd;
+			si.player[0].start_score = 501;
+			wi.score_left_wnd[0] = score_left_create(hInst, hWnd, 0, &si.player[0]);
+
+			si.player[1].start_score = 501;
+			wi.score_left_wnd[1] = score_left_create(hInst, hWnd, 0, &si.player[1]);
 			break;
 
 		case WM_EXITSIZEMOVE:
@@ -52,6 +64,17 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				op.window_rect.right -= op.window_rect.left;
 				op.window_rect.bottom -= op.window_rect.top;
 			}
+			break;
+
+		case WM_SIZE:
+			op.window_state = (IsZoomed(hWnd) == 0) ? SW_SHOWDEFAULT : SW_MAXIMIZE;
+
+			GetClientRect(hWnd, &rect);
+			left = 0;
+			right = rect.right;
+			left_height = 0;
+			guide_height = 0;
+
 			break;
 
 		case WM_CLOSE:
@@ -184,6 +207,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	get_path(hInst);
 	if (ini_get_option(ini_path) == FALSE) {
+		message_get_error(GetLastError(), err_str);
+		MessageBox(NULL, err_str, APP_NAME, MB_ICONERROR);
+		return 0;
+	}
+	
+	if (score_left_regist(hInstance) == FALSE) {
 		message_get_error(GetLastError(), err_str);
 		MessageBox(NULL, err_str, APP_NAME, MB_ICONERROR);
 		return 0;

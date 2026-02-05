@@ -7,3 +7,4 @@
 
 
 #define IDS_STRING_EXIT  				10001
+#define IDS_STRING_DEFAULT_FONT  		10002
