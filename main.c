@@ -46,7 +46,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 	RECT rect;
 	int left, right;
 	int left_height, guide_height;
-
+	int i;
 
 	switch (msg) {
 		case WM_CREATE:
@@ -56,6 +56,11 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 			si.player[1].start_score = 501;
 			wi.score_left_wnd[1] = score_left_create(hInst, hWnd, 0, &si.player[1]);
+
+			if (op.view_left == 1) {
+				ShowWindow(wi.score_left_wnd[0], SW_SHOW);
+				ShowWindow(wi.score_left_wnd[1], SW_SHOW);
+			}
 			break;
 
 		case WM_EXITSIZEMOVE:
@@ -68,13 +73,23 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 		case WM_SIZE:
 			op.window_state = (IsZoomed(hWnd) == 0) ? SW_SHOWDEFAULT : SW_MAXIMIZE;
-
+			
 			GetClientRect(hWnd, &rect);
 			left = 0;
 			right = rect.right;
 			left_height = 0;
 			guide_height = 0;
-
+			
+			if (op.view_left == 1) {
+				left_height = SendMessage(wi.score_left_wnd[0], WM_LEFT_GET_HEIGHT, rect.right/2, (LPARAM)&i);
+				SendMessage(wi.score_left_wnd[0], WM_LEFT_SET_FONT_SIZE, 0, i);
+				SendMessage(wi.score_left_wnd[1], WM_LEFT_SET_FONT_SIZE, 0, i);
+				MoveWindow(wi.score_left_wnd[0], 0, rect.bottom - left_height - guide_height,
+					rect.right / 2 - 2, left_height, TRUE);
+				MoveWindow(wi.score_left_wnd[1], rect.right / 2 + 2, rect.bottom - left_height - guide_height,
+					rect.right / 2 - 2, left_height, TRUE);
+				left_height += 4;
+			}
 			break;
 
 		case WM_CLOSE:

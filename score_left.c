@@ -89,9 +89,9 @@ static BOOL draw_score(const HWND hWnd, const DRAW_BUFFER *bf)
 		rect.top + (rect.bottom - rect.top - sz.cy) / 2,
 		buf, len);
 
-	if (bf->current == TRUE) {
+//	if (bf->current == TRUE) {
 		FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
-	}
+//	}
 	return TRUE;
 }
 
@@ -179,6 +179,62 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			draw_score(hWnd, bf);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
+			break;
+
+		case WM_LEFT_GET_HEIGHT:
+			// Set the font size and retrieve the font height
+			ret = 0;
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			if (op.left_font_size == 0) {
+				op.left_font_size = 40;
+			}
+			size = (wParam / op.left_font_size) * 10;
+			while (1) {
+				hfont = font_create(op.font_name, size, 0, FALSE, FALSE);
+				ret_font = SelectObject(bf->draw_dc, hfont);
+				GetTextExtentPoint32(bf->draw_dc, TEXT("8888"), 4, &sz);
+				if (wParam <= 0 || (WPARAM)sz.cx <= wParam) {
+					GetTextMetrics(bf->draw_dc, &tm);
+					ret = tm.tmHeight;
+					SelectObject(bf->draw_dc, ret_font);
+					DeleteObject(hfont);
+					break;
+				}
+				SelectObject(bf->draw_dc, ret_font);
+				DeleteObject(hfont);
+				size--;
+			}
+			if (lParam != 0) {
+				*((int *)lParam) = size;
+			}
+			return ret;
+
+		case WM_LEFT_SET_CURRENT:
+			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			bf->current = wParam;
+
+			if (bf->current == TRUE) {
+				FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
+			} else {
+				FillRgn(bf->draw_dc, bf->hrgn, bf->back_brush);
+			}
+			InvalidateRgn(hWnd, bf->hrgn, FALSE);
+			UpdateWindow(hWnd);
+			break;
+
+
+		case WM_LEFT_SET_FONT_SIZE:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL){
+				break;
+			}			
+			bf->font_size = lParam;
 			break;
 
 		case WM_PAINT:

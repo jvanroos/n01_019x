@@ -41,6 +41,7 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	}
 
 	op.window_state = profile_get_int(TEXT("window"), TEXT("state"), SW_SHOWDEFAULT, ini_path);
+	op.view_left = profile_get_int(TEXT("view"), TEXT("left"), 1, ini_path);
 
 	profile_get_string(TEXT("font"), TEXT("name"), message_get_res(IDS_STRING_DEFAULT_FONT), op.font_name, BUF_SIZE - 1, ini_path);
 	op.left_font_size = profile_get_int(TEXT("font"), TEXT("left_font_size"), 40, ini_path);
