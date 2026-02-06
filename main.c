@@ -61,6 +61,9 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, MF_CHECKED);
 				ShowWindow(wi.score_left_wnd[0], SW_SHOW);
 				ShowWindow(wi.score_left_wnd[1], SW_SHOW);
+
+				// TO DO: replace this to ID_MENU_ITEM_OPTION 
+				SendMessage(wi.score_left_wnd[0], WM_LEFT_DRAW_INIT, 0, 0);
 			}
 			break;
 
@@ -111,6 +114,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 		case WM_COMMAND:
 			switch(LOWORD(wParam)) {
+
 				case ID_MENUITEM_SHOW_LEFT:
 					op.view_left = !op.view_left;
 					ShowWindow(wi.score_left_wnd[0], (op.view_left == 1) ? SW_SHOW : SW_HIDE);
@@ -118,6 +122,11 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 					CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, (op.view_left == 1) ? MF_CHECKED : MF_UNCHECKED); 
 					SendMessage(hWnd, WM_SIZE, 0, 0);
 					break;  			
+
+				case WM_WINDOW_SET_CURRENT:
+					SendMessage(wi.score_left_wnd[wParam], WM_LEFT_SET_CURRENT, TRUE, 0);
+					SendMessage(wi.score_left_wnd[!wParam], WM_LEFT_SET_CURRENT, FALSE, 0);
+					break;
 
 				case ID_MENUITEM_ABOUT:
 					MessageBox(hWnd,

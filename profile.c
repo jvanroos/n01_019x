@@ -445,6 +445,31 @@ BOOL profile_write_int(const TCHAR *section_name, const TCHAR *key_name, const i
 	return profile_write_data(section_name, key_name, ret, file_path);
 }
 
+BOOL profile_write_string(const TCHAR *section_name, const TCHAR *key_name, const TCHAR *str, const TCHAR *file_path)
+{
+	TCHAR *buf, *p;
+	BOOL ret;
+
+	if (str == NULL || *str == TEXT('\0')) {
+		return profile_write_data(section_name, key_name, TEXT(""), file_path);
+	}
+
+	if ((buf = (TCHAR *)mem_alloc(sizeof(TCHAR) * (lstrlen(str) + 3))) == NULL) {
+		return profile_write_data(section_name, key_name, str, file_path);
+	}
+
+	p = buf;
+	*(p++) = TEXT('"');
+	lstrcpy(p, str);
+	p +=lstrlen(p);
+	*(p++) = TEXT('"');
+	*(p++) = TEXT('\0');
+	ret = profile_write_data(section_name, key_name, buf, file_path);
+	mem_free((void *)&buf);
+	return ret;
+}
+
+
 /*
  * profile_write_data - Data writing
  */

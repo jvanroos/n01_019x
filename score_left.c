@@ -128,7 +128,7 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 	hrgn[0] = CreateRectRgnIndirect(&rect);
 	SetRect(&del_rect, rect.bottom / BORDER_SIZE, rect.bottom / BORDER_SIZE,
 		rect.right - rect.bottom / BORDER_SIZE, rect.bottom - rect.bottom / BORDER_SIZE);
-	hrgn[1] = CreateRectRgnIndirect(&rect);
+	hrgn[1] = CreateRectRgnIndirect(&del_rect);
 	bf->hrgn = CreateRectRgnIndirect(&rect);
 	CombineRgn(bf->hrgn, hrgn[0], hrgn[1], RGN_DIFF);
 	DeleteObject(hrgn[0]);
@@ -211,6 +211,30 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 				*((int *)lParam) = size;
 			}
 			return ret;
+		
+		case WM_LEFT_REDRAW:
+			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			draw_score(hWnd, bf);
+			InvalidateRect(hWnd, NULL, FALSE);
+			UpdateWindow(hWnd);
+			break;
+
+		case WM_LEFT_DRAW_INIT:
+			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			draw_free(hWnd, bf);
+			draw_init(hWnd, bf);
+			DeleteObject(bf->back_brush);
+			DeleteObject(bf->active_border_brush);
+			bf->back_brush = CreateSolidBrush(RGB(255, 255, 255));	// replace with op.ci.left_background
+			bf->active_border_brush = CreateSolidBrush(RGB(64,128,255)); // replace with op.ci.left_active_border
+			SendMessage(hWnd, WM_LEFT_REDRAW, 0, 0);
+			break;
 
 		case WM_LEFT_SET_CURRENT:
 			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
@@ -235,18 +259,18 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 				break;
 			}			
 			bf->font_size = lParam;
+			break;
 
-
-			// FONT opnieuw maken en toepassen
+		case WM_SIZE:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			draw_free(hWnd, bf);
 			draw_init(hWnd, bf);
-
-			// SCORE opnieuw tekenen
 			draw_score(hWnd, bf);
-
-			// venster laten refreshen
-			InvalidateRect(hWnd, NULL, TRUE);
+			InvalidateRect(hWnd, NULL, FALSE);
 			UpdateWindow(hWnd);
-
 			break;
 
 		case WM_PAINT:

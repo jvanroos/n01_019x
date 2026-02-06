@@ -63,6 +63,12 @@ BOOL ini_put_option(const TCHAR *ini_path)
 	profile_write_int(TEXT("window"), TEXT("bottom"), op.window_rect.bottom, ini_path);
 	profile_write_int(TEXT("window"), TEXT("state"), op.window_state, ini_path);
 
+
+	profile_write_int(TEXT("view"), TEXT("left"), op.view_left, ini_path);
+
+	profile_write_string(TEXT("font"), TEXT("name"), op.font_name, ini_path);
+	profile_write_int(TEXT("font"), TEXT("left_font_size"), op.left_font_size, ini_path);
+
 	profile_flush(ini_path);
 	profile_free();
 	return TRUE;

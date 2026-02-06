@@ -8,6 +8,8 @@
 #define APP_NAME						TEXT("n01 Ver 0.1.9")
 #define APP_VERSION						18
 
+#define WM_WINDOW_SET_CURRENT			(WM_APP + 8)
+
 typedef struct _OPTION_INFO {
 	RECT 	window_rect;
 	int		window_state;
