@@ -84,7 +84,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				left_height = SendMessage(wi.score_left_wnd[0], WM_LEFT_GET_HEIGHT, rect.right/2, (LPARAM)&i);
 				SendMessage(wi.score_left_wnd[0], WM_LEFT_SET_FONT_SIZE, 0, i);
 				SendMessage(wi.score_left_wnd[1], WM_LEFT_SET_FONT_SIZE, 0, i);
-//
+// TO DO: InvalidateRect weghalen
 				InvalidateRect(wi.score_left_wnd[0], NULL, TRUE);
 				InvalidateRect(wi.score_left_wnd[1], NULL, TRUE);
 
@@ -110,6 +110,14 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 		case WM_COMMAND:
 			switch(LOWORD(wParam)) {
+				case ID_MENUITEM_SHOW_LEFT:
+					op.view_left = !op.view_left;
+					ShowWindow(wi.score_left_wnd[0], (op.view_left == 1) ? SW_SHOW : SW_HIDE);
+					ShowWindow(wi.score_left_wnd[1], (op.view_left == 1) ? SW_SHOW : SW_HIDE);
+					CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, (op.view_left == 1) ? MF_CHECKED : MF_UNCHECKED); 
+					SendMessage(hWnd, WM_SIZE, 0, 0);
+					break;  			
+
 				case ID_MENUITEM_ABOUT:
 					MessageBox(hWnd,
 						APP_NAME
