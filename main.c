@@ -58,6 +58,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			wi.score_left_wnd[1] = score_left_create(hInst, hWnd, 0, &si.player[1]);
 
 			if (op.view_left == 1) {
+				CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, MF_CHECKED);
 				ShowWindow(wi.score_left_wnd[0], SW_SHOW);
 				ShowWindow(wi.score_left_wnd[1], SW_SHOW);
 			}
