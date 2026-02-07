@@ -89,8 +89,9 @@ static BOOL draw_score(const HWND hWnd, const DRAW_BUFFER *bf)
 		rect.top + (rect.bottom - rect.top - sz.cy) / 2,
 		buf, len);
 
+// TO DO: remove the comments from the condition statement.
 //	if (bf->current == TRUE) {
-		FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
+//		FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
 //	}
 	return TRUE;
 }
@@ -232,7 +233,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			DeleteObject(bf->back_brush);
 			DeleteObject(bf->active_border_brush);
 			bf->back_brush = CreateSolidBrush(RGB(255, 255, 255));	// replace with op.ci.left_background
-			bf->active_border_brush = CreateSolidBrush(RGB(64,128,255)); // replace with op.ci.left_active_border
+			bf->active_border_brush = CreateSolidBrush(RGB(0,0,0)); // replace with op.ci.left_active_border
 			SendMessage(hWnd, WM_LEFT_REDRAW, 0, 0);
 			break;
 
@@ -241,7 +242,8 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			if (bf == NULL) {
 				break;
 			}
-			bf->current = wParam;
+			// wParam contains TTUE or FALSE according to the wParam from SendMessage()
+			bf->current = wParam;	
 
 			if (bf->current == TRUE) {
 				FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
@@ -251,8 +253,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			InvalidateRgn(hWnd, bf->hrgn, FALSE);
 			UpdateWindow(hWnd);
 			break;
-
-
+			
 		case WM_LEFT_SET_FONT_SIZE:
 			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL){

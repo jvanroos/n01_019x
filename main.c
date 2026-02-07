@@ -88,9 +88,6 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				left_height = SendMessage(wi.score_left_wnd[0], WM_LEFT_GET_HEIGHT, rect.right/2, (LPARAM)&i);
 				SendMessage(wi.score_left_wnd[0], WM_LEFT_SET_FONT_SIZE, 0, i);
 				SendMessage(wi.score_left_wnd[1], WM_LEFT_SET_FONT_SIZE, 0, i);
-// TO DO: InvalidateRect weghalen
-				InvalidateRect(wi.score_left_wnd[0], NULL, TRUE);
-				InvalidateRect(wi.score_left_wnd[1], NULL, TRUE);
 
 				MoveWindow(wi.score_left_wnd[0], 0, rect.bottom - left_height - guide_height,
 					rect.right / 2 - 2, left_height, TRUE);
