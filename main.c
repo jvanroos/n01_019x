@@ -6,6 +6,7 @@
 #include "ini.h"
 #include "memory.h"
 #include "message.h"
+#include "score_left.h"
 #include "resource.h"
 
 /* Define */
@@ -17,6 +18,7 @@
 HINSTANCE hInst;
 
 OPTION_INFO 	op;					// defined in general.h
+SCORE_INFO		si;
 
 TCHAR work_path[MAX_PATH];
 TCHAR ini_path[MAX_PATH];
@@ -41,9 +43,28 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 {
 	static WINDOW_INFO wi;
 
+	RECT rect;
+	int left, right;
+	int left_height, guide_height;
+	int i;
+
 	switch (msg) {
 		case WM_CREATE:
 			wi.hWnd = hWnd;
+			si.player[0].start_score = 501;
+			wi.score_left_wnd[0] = score_left_create(hInst, hWnd, 0, &si.player[0]);
+
+			si.player[1].start_score = 501;
+			wi.score_left_wnd[1] = score_left_create(hInst, hWnd, 0, &si.player[1]);
+
+			if (op.view_left == 1) {
+				CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, MF_CHECKED);
+				ShowWindow(wi.score_left_wnd[0], SW_SHOW);
+				ShowWindow(wi.score_left_wnd[1], SW_SHOW);
+
+				// TO DO: replace this to ID_MENU_ITEM_OPTION 
+				SendMessage(wi.score_left_wnd[0], WM_LEFT_DRAW_INIT, 0, 0);
+			}
 			break;
 
 		case WM_EXITSIZEMOVE:
@@ -51,6 +72,28 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				GetWindowRect(hWnd, (LPRECT)&op.window_rect);
 				op.window_rect.right -= op.window_rect.left;
 				op.window_rect.bottom -= op.window_rect.top;
+			}
+			break;
+
+		case WM_SIZE:
+			op.window_state = (IsZoomed(hWnd) == 0) ? SW_SHOWDEFAULT : SW_MAXIMIZE;
+			
+			GetClientRect(hWnd, &rect);
+			left = 0;
+			right = rect.right;
+			left_height = 0;
+			guide_height = 0;
+			
+			if (op.view_left == 1) {
+				left_height = SendMessage(wi.score_left_wnd[0], WM_LEFT_GET_HEIGHT, rect.right/2, (LPARAM)&i);
+				SendMessage(wi.score_left_wnd[0], WM_LEFT_SET_FONT_SIZE, 0, i);
+				SendMessage(wi.score_left_wnd[1], WM_LEFT_SET_FONT_SIZE, 0, i);
+
+				MoveWindow(wi.score_left_wnd[0], 0, rect.bottom - left_height - guide_height,
+					rect.right / 2 - 2, left_height, TRUE);
+				MoveWindow(wi.score_left_wnd[1], rect.right / 2 + 2, rect.bottom - left_height - guide_height,
+					rect.right / 2 - 2, left_height, TRUE);
+				left_height += 4;
 			}
 			break;
 
@@ -68,6 +111,20 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 		case WM_COMMAND:
 			switch(LOWORD(wParam)) {
+
+				case ID_MENUITEM_SHOW_LEFT:
+					op.view_left = !op.view_left;
+					ShowWindow(wi.score_left_wnd[0], (op.view_left == 1) ? SW_SHOW : SW_HIDE);
+					ShowWindow(wi.score_left_wnd[1], (op.view_left == 1) ? SW_SHOW : SW_HIDE);
+					CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, (op.view_left == 1) ? MF_CHECKED : MF_UNCHECKED); 
+					SendMessage(hWnd, WM_SIZE, 0, 0);
+					break;  			
+
+				case WM_WINDOW_SET_CURRENT:
+					SendMessage(wi.score_left_wnd[wParam], WM_LEFT_SET_CURRENT, TRUE, 0);
+					SendMessage(wi.score_left_wnd[!wParam], WM_LEFT_SET_CURRENT, FALSE, 0);
+					break;
+
 				case ID_MENUITEM_ABOUT:
 					MessageBox(hWnd,
 						APP_NAME
@@ -184,6 +241,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	get_path(hInst);
 	if (ini_get_option(ini_path) == FALSE) {
+		message_get_error(GetLastError(), err_str);
+		MessageBox(NULL, err_str, APP_NAME, MB_ICONERROR);
+		return 0;
+	}
+	
+	if (score_left_regist(hInstance) == FALSE) {
 		message_get_error(GetLastError(), err_str);
 		MessageBox(NULL, err_str, APP_NAME, MB_ICONERROR);
 		return 0;

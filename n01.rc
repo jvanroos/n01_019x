@@ -13,16 +13,19 @@ IDR_MENU_MAIN MENU
   {
     MENUITEM "E&xit", ID_MENUITEM_EXIT
   }
+  POPUP "View"
+  {
+    MENUITEM "Left Score", ID_MENUITEM_SHOW_LEFT
+  }
   POPUP "Help"
   {
     MENUITEM "About", ID_MENUITEM_ABOUT
   }
 }
 
-LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
-
 STRINGTABLE
 {
   IDS_STRING_EXIT, "Do you want to exit\?"
+  IDS_STRING_DEFAULT_FONT, "Arial"
 }
 

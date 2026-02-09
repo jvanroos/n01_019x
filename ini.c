@@ -12,6 +12,7 @@
 #include "general.h"
 #include "memory.h"
 #include "profile.h"
+#include "message.h"
 
 #include "resource.h"
 
@@ -40,6 +41,10 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	}
 
 	op.window_state = profile_get_int(TEXT("window"), TEXT("state"), SW_SHOWDEFAULT, ini_path);
+	op.view_left = profile_get_int(TEXT("view"), TEXT("left"), 1, ini_path);
+
+	profile_get_string(TEXT("font"), TEXT("name"), message_get_res(IDS_STRING_DEFAULT_FONT), op.font_name, BUF_SIZE - 1, ini_path);
+	op.left_font_size = profile_get_int(TEXT("font"), TEXT("left_font_size"), 40, ini_path);
 
 	profile_free();
 	return TRUE;
@@ -57,6 +62,12 @@ BOOL ini_put_option(const TCHAR *ini_path)
 	profile_write_int(TEXT("window"), TEXT("right"), op.window_rect.right, ini_path);
 	profile_write_int(TEXT("window"), TEXT("bottom"), op.window_rect.bottom, ini_path);
 	profile_write_int(TEXT("window"), TEXT("state"), op.window_state, ini_path);
+
+
+	profile_write_int(TEXT("view"), TEXT("left"), op.view_left, ini_path);
+
+	profile_write_string(TEXT("font"), TEXT("name"), op.font_name, ini_path);
+	profile_write_int(TEXT("font"), TEXT("left_font_size"), op.left_font_size, ini_path);
 
 	profile_flush(ini_path);
 	profile_free();
