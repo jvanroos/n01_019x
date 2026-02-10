@@ -214,7 +214,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			return ret;
 		
 		case WM_LEFT_REDRAW:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
@@ -224,7 +224,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			break;
 
 		case WM_LEFT_DRAW_INIT:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
@@ -238,7 +238,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			break;
 
 		case WM_LEFT_SET_CURRENT:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
