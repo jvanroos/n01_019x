@@ -8,6 +8,7 @@
 #include "message.h"
 #include "score_left.h"
 #include "resource.h"
+#include "game_option.h"
 
 /* Define */
 #define MAIN_WND_CLASS				TEXT("n01_wnd")

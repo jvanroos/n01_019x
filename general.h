@@ -8,6 +8,8 @@
 #define APP_NAME						TEXT("n01 Ver 0.1.9")
 #define APP_VERSION						18
 
+#define NAME_LIST_COUNT					64
+
 #define WM_WINDOW_SET_CURRENT			(WM_APP + 8)
 
 // typedef
@@ -67,6 +69,13 @@ typedef struct _OPTION_INFO {
 	int 	recovery_delete;
 	int 	left_font_size;
 	TCHAR 	font_name[BUF_SIZE];
+
+	// Game Option
+	GAME_INFO gi;
+	GAME_INFO *gi_list;
+	int gi_list_count;
+	TCHAR name_list[NAME_LIST_COUNT][NAME_SIZE];
+	int name_list_count;
 
 	// Option Player
 	OP_PLAYER_INFO opi;
