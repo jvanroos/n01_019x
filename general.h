@@ -67,6 +67,9 @@ typedef struct _OPTION_INFO {
 	int 	recovery_delete;
 	int 	left_font_size;
 	TCHAR 	font_name[BUF_SIZE];
+
+	// Option Player
+	OP_PLAYER_INFO opi;
 } OPTION_INFO;	
 
 typedef struct _PLAYER_INFO {

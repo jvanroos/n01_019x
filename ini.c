@@ -46,6 +46,9 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	profile_get_string(TEXT("font"), TEXT("name"), message_get_res(IDS_STRING_DEFAULT_FONT), op.font_name, BUF_SIZE - 1, ini_path);
 	op.left_font_size = profile_get_int(TEXT("font"), TEXT("left_font_size"), 40, ini_path);
 
+	// Player game information
+	op.opi.large_font = profile_get_int(TEXT("player"), TEXT("large_font"), 0, ini_path);
+
 	profile_free();
 	return TRUE;
 }
@@ -68,6 +71,9 @@ BOOL ini_put_option(const TCHAR *ini_path)
 
 	profile_write_string(TEXT("font"), TEXT("name"), op.font_name, ini_path);
 	profile_write_int(TEXT("font"), TEXT("left_font_size"), op.left_font_size, ini_path);
+
+	// Player Information
+	profile_write_int(TEXT("player"), TEXT("large_font"), op.opi.large_font, ini_path);
 
 	profile_flush(ini_path);
 	profile_free();

@@ -112,6 +112,9 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 		case WM_COMMAND:
 			switch(LOWORD(wParam)) {
 
+				case ID_MENUITEM_NEW_GAME:
+					break;
+
 				case ID_MENUITEM_SHOW_LEFT:
 					op.view_left = !op.view_left;
 					ShowWindow(wi.score_left_wnd[0], (op.view_left == 1) ? SW_SHOW : SW_HIDE);
