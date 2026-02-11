@@ -114,6 +114,10 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			switch(LOWORD(wParam)) {
 
 				case ID_MENUITEM_NEW_GAME:
+					if (show_game_option(hInst, hWnd, &op.gi) == FALSE) {
+						break;
+					}
+//					SendMessage(hWnd, WM_N01_GAME_ON, TRUE, 0);
 					break;
 
 				case ID_MENUITEM_SHOW_LEFT:
