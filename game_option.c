@@ -10,6 +10,7 @@
 #include <windows.h>
 #undef  _INC_OLE
 #include <commctrl.h>
+#include <imm.h>
 
 #include "General.h"
 #include "Message.h"
@@ -42,8 +43,53 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 				EndDialog(hDlg, FALSE);
 				break;
 			}
-			SetWindowLong(hDlg, GWL_USERDATA, lParam);
+			SetWindowLongPtr(hDlg, GWLP_USERDATA, (LONG_PTR)lParam);
 			
+			// Position window in center of parent window
+			GetWindowRect(GetParent(hDlg), &parent_rect);
+			GetWindowRect(hDlg, &rect);
+			left = parent_rect.left + ((parent_rect.right - parent_rect.left) - (rect.right - rect.left)) / 2;
+			if (left < 0) left = 0;
+			top = parent_rect.top + ((parent_rect.bottom - parent_rect.top) - (rect.bottom - rect.top)) / 2;
+			if (top < 0) top = 0;
+			SetWindowPos(hDlg, 0, left, top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+			// Set the ranges of the controls
+			SendDlgItemMessage(hDlg, IDC_SPIN_SCORE, UDM_SETRANGE, 0, (LPARAM)MAKELONG(UD_MAXVAL, 2));
+			SendDlgItemMessage(hDlg, IDC_SPIN_ROUND, UDM_SETRANGE, 0, (LPARAM)MAKELONG(UD_MAXVAL, 1));
+			SendDlgItemMessage(hDlg, IDC_SPIN_LEG, UDM_SETRANGE, 0, (LPARAM)MAKELONG(UD_MAXVAL, 1));
+			SendDlgItemMessage(hDlg, IDC_SPIN_P1_SCORE, UDM_SETRANGE, 0, (LPARAM)MAKELONG(UD_MAXVAL, 2));
+			SendDlgItemMessage(hDlg, IDC_SPIN_P2_SCORE, UDM_SETRANGE, 0, (LPARAM)MAKELONG(UD_MAXVAL, 2));
+
+			SendDlgItemMessage(hDlg, IDC_EDIT_SCORE, EM_LIMITTEXT, 5, 0);
+			SendDlgItemMessage(hDlg, IDC_EDIT_ROUND, EM_LIMITTEXT, 4, 0);
+			SendDlgItemMessage(hDlg, IDC_EDIT_LEG, EM_LIMITTEXT, 5, 0);
+			SendDlgItemMessage(hDlg, IDC_EDIT_P1_SCORE, EM_LIMITTEXT, 5, 0);
+			SendDlgItemMessage(hDlg, IDC_EDIT_P2_SCORE, EM_LIMITTEXT, 5, 0);
+			ImmAssociateContext(GetDlgItem(hDlg, IDC_EDIT_SCORE), (HIMC)NULL);
+			ImmAssociateContext(GetDlgItem(hDlg, IDC_EDIT_ROUND), (HIMC)NULL);
+			ImmAssociateContext(GetDlgItem(hDlg, IDC_EDIT_P1_SCORE), (HIMC)NULL);
+			ImmAssociateContext(GetDlgItem(hDlg, IDC_EDIT_P2_SCORE), (HIMC)NULL);
+			ImmAssociateContext(GetDlgItem(hDlg, IDC_EDIT_LEG), (HIMC)NULL);
+			
+			SetDlgItemInt(hDlg, IDC_EDIT_SCORE, gi->start_score, FALSE);
+			EnableWindow(GetDlgItem(hDlg, IDC_EDIT_SCORE), FALSE);
+
+			switch(gi->start_score) {
+				case 301:
+					CheckDlgButton(hDlg, IDC_RADIO_301, 1);
+					break;
+				case 501:
+					CheckDlgButton(hDlg, IDC_RADIO_501, 1);
+					break;
+				case 1001:
+					CheckDlgButton(hDlg, IDC_RADIO_1001, 1);
+					break;
+				default:
+					CheckDlgButton(hDlg, IDC_RADIO_ETC, 1);
+					EnableWindow(GetDlgItem(hDlg, IDC_EDIT_SCORE), TRUE);
+				break;
+			}
 			break;
 
 		case WM_CLOSE:
