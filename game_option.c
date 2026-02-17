@@ -98,6 +98,23 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 		
 		case WM_COMMAND:
 			switch(LOWORD(wParam)) {
+				case IDC_RADIO_301:
+				case IDC_RADIO_501:
+				case IDC_RADIO_1001:
+				case IDC_RADIO_ETC:
+					EnableWindow(GetDlgItem(hDlg, IDC_EDIT_SCORE), FALSE);
+					if (IsDlgButtonChecked(hDlg, IDC_RADIO_301) == 1) {
+						SetDlgItemInt(hDlg, IDC_EDIT_ROUND, 10, FALSE);
+					}else if (IsDlgButtonChecked(hDlg, IDC_RADIO_501) == 1) {
+						SetDlgItemInt(hDlg, IDC_EDIT_ROUND, 15, FALSE);
+					} else if (IsDlgButtonChecked(hDlg, IDC_RADIO_1001) == 1) {
+						SetDlgItemInt(hDlg, IDC_EDIT_ROUND, 30, FALSE);
+					} else {
+						EnableWindow(GetDlgItem(hDlg, IDC_EDIT_SCORE), TRUE);
+						SetDlgItemInt(hDlg, IDC_EDIT_ROUND, MAX_ROUND, FALSE);
+					}
+					break;
+
 				case IDCANCEL:
 					SendMessage(hDlg, WM_CLOSE, 0, 0);
 					break;
