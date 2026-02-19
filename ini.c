@@ -40,6 +40,8 @@ BOOL ini_get_option(const TCHAR *ini_path)
 		op.window_rect.top = 0;
 	}
 
+	// game option
+	op.gi.start_score = profile_get_int(TEXT("game"), TEXT("start_score"), 501, ini_path);
 	op.window_state = profile_get_int(TEXT("window"), TEXT("state"), SW_SHOWDEFAULT, ini_path);
 	op.view_left = profile_get_int(TEXT("view"), TEXT("left"), 1, ini_path);
 
@@ -74,6 +76,16 @@ BOOL ini_put_option(const TCHAR *ini_path)
 
 	// Player Information
 	profile_write_int(TEXT("player"), TEXT("large_font"), op.opi.large_font, ini_path);
+
+	profile_flush(ini_path);
+	profile_free();
+	return TRUE;
+}
+
+BOOL ini_put_game_option(const TCHAR *ini_path) 
+{
+	profile_initialize(ini_path, TRUE);
+	profile_write_int(TEXT("game"), TEXT("start_score"), op.gi.start_score, ini_path);
 
 	profile_flush(ini_path);
 	profile_free();

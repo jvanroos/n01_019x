@@ -176,7 +176,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			SetBkMode(bf->draw_dc, TRANSPARENT);
 			bf->back_brush = CreateSolidBrush(RGB(255, 255, 255));	// TODO: Nog te vervangen.
 			bf->active_border_brush = CreateSolidBrush(RGB(0, 0, 255)); // TODO: Nog te vervangen.
-			bf->pi->left = 501;	// TODO: Moet uit de GAME_INFO komen.
+//			bf->pi->left = 501;	// TODO: Moet uit de GAME_INFO komen.
 			draw_score(hWnd, bf);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);

@@ -12,6 +12,7 @@
 #include "general.h"
 
 /* Define */
+#define WM_PLAYER_SET_MODE			(WM_APP + 303)
 
 /* Struct */
 

@@ -79,6 +79,11 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
 			break;
 
+		case WM_PLAYER_SET_MODE:
+
+			break;
+
+
 		case WM_CLOSE:
 			DestroyWindow(hWnd);
 			break;

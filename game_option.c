@@ -120,7 +120,39 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 					break;
 
 				case IDOK:
-					EndDialog(hDlg, TRUE);
+				case IDC_BUTTON_SAVE:
+					gi = (GAME_INFO *)GetWindowLongPtr(hDlg, GWLP_USERDATA);
+					if (gi == NULL) {
+						EndDialog(hDlg, TRUE);
+						break;
+					}
+
+					tmp_gi = *gi;
+					ZeroMemory(gi, sizeof(GAME_INFO));
+
+					if (IsDlgButtonChecked(hDlg, IDC_RADIO_301) == 1) {
+						gi->start_score = 301;
+					} else if (IsDlgButtonChecked(hDlg, IDC_RADIO_501) == 1) {
+						gi->start_score = 501;
+					} else if (IsDlgButtonChecked(hDlg, IDC_RADIO_1001) == 1) {
+						gi->start_score = 1001;
+					} else {
+						gi->start_score = GetDlgItemInt(hDlg, IDC_EDIT_SCORE, NULL, FALSE);
+						if (gi->start_score < 2) {
+							gi->start_score = 2;
+						}
+						if (gi->start_score > 99999) {
+							gi->start_score = 99999;
+						}
+					}
+
+					if(LOWORD(wParam) == IDC_BUTTON_SAVE) {
+						ini_put_game_option(ini_path);
+						*gi = tmp_gi;
+						MessageBox(hDlg, message_get_res(IDS_STRING_OP_GAME_SAVE), APP_NAME, MB_ICONINFORMATION);
+					} else {
+						EndDialog(hDlg, TRUE);
+					}
 					break;
 			}
 			break;

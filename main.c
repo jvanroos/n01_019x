@@ -9,6 +9,8 @@
 #include "score_left.h"
 #include "resource.h"
 #include "game_option.h"
+#include "score_info.h"
+#include "score_player.h"
 
 /* Define */
 #define MAIN_WND_CLASS				TEXT("n01_wnd")
@@ -117,7 +119,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 					if (show_game_option(hInst, hWnd, &op.gi) == FALSE) {
 						break;
 					}
-//					SendMessage(hWnd, WM_N01_GAME_ON, TRUE, 0);
+					SendMessage(hWnd, WM_N01_GAME_ON, FALSE, 0);
 					break;
 
 				case ID_MENUITEM_SHOW_LEFT:
@@ -145,6 +147,16 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 					SendMessage(hWnd, WM_CLOSE, 0, 0);
 					break;
 			}
+			break;
+
+		case WM_N01_GAME_ON:
+			si.set_mode = wParam;
+			si.current_set = 0;
+			if (score_info_init(hWnd, &si, (wParam == TRUE) ? &op.gi_list[si.current_set] : &op.gi, TRUE) == FALSE) {
+				return FALSE;
+			}
+			SendMessage(wi.score_player_wnd[0], WM_PLAYER_SET_MODE, (si.leg_limit == 1) ? TRUE : FALSE, 0);
+			SendMessage(wi.score_player_wnd[1], WM_PLAYER_SET_MODE, (si.leg_limit == 1) ? TRUE : FALSE, 0);
 			break;
 
 		default:

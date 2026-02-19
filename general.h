@@ -13,8 +13,15 @@
 #define NAME_LIST_COUNT					64
 
 #define WM_WINDOW_SET_CURRENT			(WM_APP + 8)
+#define WM_N01_GAME_ON					(WM_APP + 531)
+
+typedef char TYPE_CHECK_OUT;
 
 // typedef
+typedef short TYPE_SCORE;
+typedef char TYPE_CHECK_OUT;
+
+/* Struct */
 typedef struct _GAME_INFO {
 	int start_score;
 	int round_limit;
@@ -89,9 +96,58 @@ typedef struct _PLAYER_INFO {
 	int left;
 } PLAYER_INFO;
 
+typedef struct _LEG_INFO {
+	int first;
+
+	int current_round;
+	int current_player;
+
+	int max_round;
+	int alloc_round;
+
+	TYPE_SCORE *score[2];
+
+	BOOL end_flag;
+	int winner;
+	int darts;
+	TYPE_SCORE out_left;
+
+	int ton_count[2];
+	int ton00_count[2];
+	int ton20_count[2];
+	int ton40_count[2];
+	int ton80_count[2];
+	int all_score[2];
+	int all_darts[2];
+	int first9_score[2];
+	int first9_darts[2];
+	int check_out_aim[2];
+	int failure_2_80[2];
+	int failure_81_130[2];
+	int failure_131[2];
+} LEG_INFO;
+
 typedef struct _SCORE_INFO {
+	BOOL set_mode;
+	BOOL history;
+
+	int start_score;
+
+	int current_set;
+	int current_leg;
+
+	int leg_limit;
+	int max_leg;
+	int best_of;
+
+	int round_limit;
+	int round;
+
+	SYSTEMTIME start_time;
+
 	PLAYER_INFO player[2];
-	int 	start_score;
+	LEG_INFO *leg;
+	TYPE_CHECK_OUT *tmp_check_out[2];
 } SCORE_INFO;
 
 #endif
