@@ -6,14 +6,15 @@
 #define BUF_SIZE						256
 #define NAME_SIZE						64
 #define APP_NAME						TEXT("n01 Ver 0.1.9")
-#define APP_VERSION						18
+#define APP_VERSION					18
 
 
 #define MAX_ROUND						60
-#define NAME_LIST_COUNT					64
+#define NAME_LIST_COUNT				64
 
-#define WM_WINDOW_SET_CURRENT			(WM_APP + 8)
-#define WM_N01_GAME_ON					(WM_APP + 531)
+#define WM_WINDOW_REDRAW				(WM_APP + 1)
+#define WM_WINDOW_SET_CURRENT		(WM_APP + 8)
+#define WM_N01_GAME_ON				(WM_APP + 531)
 
 typedef char TYPE_CHECK_OUT;
 
@@ -90,10 +91,62 @@ typedef struct _OPTION_INFO {
 	OP_PLAYER_INFO opi;
 } OPTION_INFO;	
 
+typedef struct _STATISTICS_INFO {
+	int ton_count;
+	int ton00_count;
+	int ton20_count;
+	int ton40_count;
+	int ton80_count;
+	TYPE_SCORE high_off;
+	int short_game;
+	int long_game;
+
+	// 
+	int all_score;
+	int all_darts;
+	// 
+	int win_darts;
+	int win_count;
+	// 
+	int first9_score;
+	int first9_darts;
+	// 
+	int check_out_aim;
+	int check_out;
+	// 
+	int all_keep_legs;
+	int win_keep_legs;
+	// 
+	int all_break_legs;
+	int win_break_legs;
+
+	// Finish stats
+	int success_2_80;
+	int failure_2_80;
+	int success_81_130;
+	int failure_81_130;
+	int success_131;
+	int failure_131;
+} STATISTICS_INFO;
+
 typedef struct _PLAYER_INFO {
 	TCHAR name[NAME_SIZE];
 	int start_score;
 	int left;
+
+	int sets;
+	int legs;
+
+	STATISTICS_INFO stat;
+	STATISTICS_INFO set_stat;
+
+	BOOL lock;
+	BOOL check_out_mode;
+
+	BOOL com;
+	int level;
+	TYPE_SCORE com_score;
+
 } PLAYER_INFO;
 
 typedef struct _LEG_INFO {

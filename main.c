@@ -149,6 +149,10 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			}
 			break;
 
+		case WM_WINDOW_REDRAW:
+			SendMessage(wi.score_left_wnd[wParam], WM_LEFT_REDRAW, 0, 0);
+			break;
+
 		case WM_N01_GAME_ON:
 			si.set_mode = wParam;
 			si.current_set = 0;
@@ -157,6 +161,10 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			}
 			SendMessage(wi.score_player_wnd[0], WM_PLAYER_SET_MODE, (si.leg_limit == 1) ? TRUE : FALSE, 0);
 			SendMessage(wi.score_player_wnd[1], WM_PLAYER_SET_MODE, (si.leg_limit == 1) ? TRUE : FALSE, 0);
+
+			// TO DO: remove this line
+			SendMessage(wi.score_left_wnd[0], WM_LEFT_REDRAW, 0, 0);
+			SendMessage(wi.score_left_wnd[1], WM_LEFT_REDRAW, 1, 0);
 			break;
 
 		default:

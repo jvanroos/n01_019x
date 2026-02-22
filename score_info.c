@@ -57,11 +57,22 @@ BOOL score_info_init(const HWND hWnd, SCORE_INFO *si, GAME_INFO *gi, const BOOL 
 	si->max_leg = gi->max_leg;
 	si->best_of = gi->best_of;
 	
+	// Option settings
 	for (i = 0; i < 2; i++) {
+		if (p_init == TRUE) {
+			ZeroMemory(&si->player[i], sizeof(PLAYER_INFO));
+		}else {
+
+		}
+
 		if (p_init == TRUE || *gi->player_name[i] != TEXT('\0') || gi->com[i] == TRUE) {
 			lstrcpy(si->player[i].name, gi->player_name[i]);
 		}
 		si->player[i].start_score = gi->player_start_score[i];
+		if (si->player[i].start_score <=0) {
+			si->player[i].start_score = gi->start_score;	
+		}
+		si->player[i].left = si->player[i].start_score;
 
 	}
 
