@@ -6,6 +6,7 @@
 #endif
 
 #define IDR_ACCELERATOR                 101
+
 #define IDR_MENU_MAIN  					107
 #define IDD_DIALOG_GAME_OPTION			108
 #define IDD_DIALOG_OPTION_PLAYER        124
@@ -56,3 +57,5 @@
 #define IDS_STRING_EXIT  				10001
 #define IDS_STRING_DEFAULT_FONT  		10002
 #define IDS_STRING_OP_GAME_SAVE  		10003
+#define IDS_STRING_PLAYER1              10004
+#define IDS_STRING_PLAYER2              10005

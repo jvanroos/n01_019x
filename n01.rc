@@ -77,10 +77,15 @@ FONT 10, "MS Sans Serif"
   CONTROL "Cancel", IDCANCEL, "Button", WS_TABSTOP, 180, 195, 50, 14
 }
 
-STRINGTABLE
+STRINGTABLE DISCARDABLE
 {
-  IDS_STRING_EXIT, "Do you want to exit\?"
   IDS_STRING_DEFAULT_FONT, "Arial"
   IDS_STRING_OP_GAME_SAVE, "The present option was saved."
 }
 
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_STRING_EXIT         "Do you want to exit?"
+    IDS_STRING_PLAYER1      "Player 1"
+    IDS_STRING_PLAYER2      "Player 2"
+END

@@ -242,7 +242,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			if (bf == NULL) {
 				break;
 			}
-			// wParam contains TTUE or FALSE according to the wParam from SendMessage()
+			// wParam contains TRUE or FALSE according to the wParam from SendMessage()
 			bf->current = wParam;	
 
 			if (bf->current == TRUE) {

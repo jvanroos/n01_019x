@@ -62,18 +62,47 @@ BOOL score_info_init(const HWND hWnd, SCORE_INFO *si, GAME_INFO *gi, const BOOL 
 		if (p_init == TRUE) {
 			ZeroMemory(&si->player[i], sizeof(PLAYER_INFO));
 		}else {
+			si->player[i].set_stat.ton_count += si->player[i].stat.ton_count;
+			si->player[i].set_stat.ton00_count += si->player[i].stat.ton00_count;
+			si->player[i].set_stat.ton40_count += si->player[i].stat.ton40_count;
+			si->player[i].set_stat.ton80_count += si->player[i].stat.ton80_count;
+			si->player[i].set_stat.high_off = (TYPE_SCORE) ((si->player[i].stat.high_off > si->player[i].set_stat.high_off) ?
+				si->player[i].stat.high_off : si->player[i].set_stat.high_off);
 
+			if (si->set_mode == TRUE && op.gi_list[si->current_set].start_score != op.gi_list[si->current_set - 1].start_score) {
+				si->player[i].set_stat.short_game = 0;
+			} else if (si->player[i].stat.short_game > 0 && 
+				(si->player[i].set_stat.short_game == 0 || si->player[i].stat.short_game < si->player[i].set_stat.short_game)) {
+				si->player[i].set_stat.short_game = si->player[i].stat.short_game;
+			}
+
+			if (si->set_mode == TRUE && op.gi_list[si->current_set].start_score != op.gi_list[si->current_set - 1].start_score) {
+				si->player[i].set_stat.long_game = 0;
+			} else if (si->player[i].stat.long_game > si->player[i].set_stat.long_game) {
+				si->player[i].set_stat.long_game = si->player[i].stat.long_game;
+			}
+		
 		}
+		
+		ZeroMemory(&si->player[i].stat, sizeof(STATISTICS_INFO));
 
 		if (p_init == TRUE || *gi->player_name[i] != TEXT('\0') || gi->com[i] == TRUE) {
 			lstrcpy(si->player[i].name, gi->player_name[i]);
 		}
+
 		si->player[i].start_score = gi->player_start_score[i];
 		if (si->player[i].start_score <=0) {
 			si->player[i].start_score = gi->start_score;	
 		}
 		si->player[i].left = si->player[i].start_score;
-
+		si->player[i].legs = 0;
+	}
+	
+	if (*si->player[0].name == TEXT('\0')) {
+		message_copy_res(IDS_STRING_PLAYER1, si->player[0].name);
+	}
+	if (*si->player[1].name == TEXT('\0')) {
+		message_copy_res(IDS_STRING_PLAYER2, si->player[1].name);
 	}
 
 	score_info_free(si);

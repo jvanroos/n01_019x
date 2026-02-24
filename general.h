@@ -24,18 +24,18 @@ typedef char TYPE_CHECK_OUT;
 
 /* Struct */
 typedef struct _GAME_INFO {
-	int start_score;
-	int round_limit;
-	int round;
-	int leg_limit;
-	int max_leg;
-	int best_of;
-	TCHAR player_name[2][NAME_SIZE];
-	int player_start_score[2];
-	BOOL com[2];
-	int level[2];
-	BOOL schedule_flag;
-	BOOL change_first;
+	int 	start_score;
+	int 	round_limit;
+	int 	round;
+	int 	leg_limit;
+	int 	max_leg;
+	int 	best_of;
+	TCHAR 	player_name[2][NAME_SIZE];
+	int 	player_start_score[2];
+	BOOL 	com[2];
+	int 	level[2];
+	BOOL 	schedule_flag;
+	BOOL 	change_first;
 } GAME_INFO;
 
 typedef struct _OP_PLAYER_INFO {
@@ -70,15 +70,27 @@ typedef struct _OP_PLAYER_INFO {
 } OP_PLAYER_INFO;
 
 typedef struct _OPTION_INFO {
-	RECT 	window_rect;
-	int		window_state;
+	RECT window_rect;
+	int	window_state;
 
-	int 	view_player;
-	int 	view_left;
+	int view_player;
+	int view_left;
+	int view_guide;
+	int view_throw_count;
+	int view_ton_circle;
+	int view_separate;
+	int view_scroll_bar;
 
-	int 	recovery_delete;
-	int 	left_font_size;
-	TCHAR 	font_name[BUF_SIZE];
+	int auto_save;
+	TCHAR 	auto_save_path[BUF_SIZE];
+	int check_out_mode;
+	int recovery;
+
+	int check_out_font_size;
+
+	// com
+	int com_default_number;
+	int com_default_segment;
 
 	// Game Option
 	GAME_INFO gi;
@@ -87,8 +99,36 @@ typedef struct _OPTION_INFO {
 	TCHAR name_list[NAME_LIST_COUNT][NAME_SIZE];
 	int name_list_count;
 
+	// Game Histroy
+	RECT history_rect;
+	RECT score_list_rect;
+
+	// Arrange
+	RECT arrange_rect;
+//	ARRANGE_INFO *arrange_info;
+	int arrange_info_count;
+//	ARRANGE_INFO *com_arrange_info;
+	int com_arrange_info_count;
+
+	// Option view
+//	COLOR_INFO ci;
+	TCHAR font_name[BUF_SIZE];
+
+	// Option key
+//	KEY_INFO *key_info;
+	int key_info_count;
+	BOOL key_save;
+
 	// Option Player
 	OP_PLAYER_INFO opi;
+
+	// Plug-in
+//	PLUGIN_INFO *plugin_info;
+	int plugin_info_count;
+
+	int recovery_delete;
+	int left_font_size;
+	int com_timer;
 } OPTION_INFO;	
 
 typedef struct _STATISTICS_INFO {
@@ -131,6 +171,7 @@ typedef struct _STATISTICS_INFO {
 
 typedef struct _PLAYER_INFO {
 	TCHAR name[NAME_SIZE];
+
 	int start_score;
 	int left;
 
