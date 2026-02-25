@@ -23,7 +23,37 @@ extern OPTION_INFO op;
 extern TCHAR ini_path[MAX_PATH];
 
 /* Local Function Prototypes */
+static void add_name_list(const TCHAR *name);
 static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+
+/*
+ * add_name_list
+ */
+static void add_name_list(const TCHAR *name) 
+{
+	int i, j;
+
+	if (*name == TEXT('\0')) {
+		return;
+	}
+
+	for (i = 0; i < op.name_list_count; i++) {
+		if(*op.name_list[i] != TEXT('\0') && lstrcmpi(name, op.name_list[i]) == 0){
+			for (j = i; j < op.name_list_count - 1; j++) {
+				lstrcpy(op.name_list[j], op.name_list[j + 1]);
+			}
+			break;
+		}
+	}
+
+	if (i >= op.name_list_count && op.name_list_count < NAME_LIST_COUNT) {
+		op.name_list_count++;
+	}
+	for (j = op.name_list_count - 1; j > 0; j--) {
+		lstrcpy(op.name_list[j], op.name_list[j - 1]);
+	}
+	lstrcpy(op.name_list[0], name);
+}
 
 /*
  * game_option_proc
@@ -97,6 +127,24 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 			SetDlgItemInt(hDlg, IDC_EDIT_ROUND, gi->round, FALSE);
 			SendMessage(hDlg, WM_COMMAND, IDC_CHECK_ROUND_LIMIT, 0);
 
+
+			SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, CB_SETEXTENDEDUI, TRUE, 0);
+			SendDlgItemMessage(hDlg, IDC_COMBO_P2_NAME, CB_SETEXTENDEDUI, TRUE, 0);
+			for (i = 0; i < op.name_list_count; i++) {
+				if (*op.name_list[i] != TEXT('\0')) {
+					SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, CB_ADDSTRING, 0, (LPARAM)op.name_list[i]);
+					SendDlgItemMessage(hDlg, IDC_COMBO_P2_NAME, CB_ADDSTRING, 0, (LPARAM)op.name_list[i]);
+				}
+			}
+			if (gi->schedule_flag == TRUE) {
+				SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, WM_SETTEXT, 0, (LPARAM)gi->player_name[0]);
+				SendDlgItemMessage(hDlg, IDC_COMBO_P2_NAME, WM_SETTEXT, 0, (LPARAM)gi->player_name[1]);
+			} else {
+				SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, WM_SETTEXT, 0,
+					(LPARAM)((*gi->player_name[0] != TEXT('\0')) ? gi->player_name[0] : message_get_res(IDS_STRING_PLAYER1)));
+				SendDlgItemMessage(hDlg, IDC_COMBO_P2_NAME, WM_SETTEXT, 0,
+					(LPARAM)((*gi->player_name[1] != TEXT('\0')) ? gi->player_name[1] : message_get_res(IDS_STRING_PLAYER2)));
+			}
 			break;
 
 		case WM_CLOSE:
@@ -146,6 +194,7 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 					tmp_gi = *gi;
 					ZeroMemory(gi, sizeof(GAME_INFO));
 
+				// Start Score
 					if (IsDlgButtonChecked(hDlg, IDC_RADIO_301) == 1) {
 						gi->start_score = 301;
 					} else if (IsDlgButtonChecked(hDlg, IDC_RADIO_501) == 1) {
@@ -161,7 +210,8 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 							gi->start_score = 99999;
 						}
 					}
-
+					
+				// Rounds
 					if (IsDlgButtonChecked(hDlg, IDC_CHECK_ROUND_LIMIT) == BST_CHECKED) {
 						gi->round_limit = 1;
 					}
@@ -174,6 +224,29 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 						gi->round = 9999 / 3; 
 					}
 
+				// Legs
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_LEG_LIMIT) == BST_CHECKED) {
+						gi->leg_limit = 1;
+					}
+					gi->max_leg = GetDlgItemInt(hDlg, IDC_EDIT_LEG, NULL, FALSE);
+					if (gi->max_leg < 1) {
+						gi->max_leg = 1;
+					}
+
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_BEST_OF) == BST_CHECKED) {
+						gi->best_of = 1;
+					}
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_CHANGE_FIRST) == BST_CHECKED) {
+						gi->change_first = 1;
+					}
+
+				// Names
+					SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, WM_GETTEXT, NAME_SIZE - 1, (LPARAM)gi->player_name[0]);
+					SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, WM_GETTEXT, NAME_SIZE - 1, (LPARAM)gi->player_name[1]);
+					add_name_list(gi->player_name[1]);
+					add_name_list(gi->player_name[0]);
+
+				// Save
 					if(LOWORD(wParam) == IDC_BUTTON_SAVE) {
 						ini_put_game_option(ini_path);
 						*gi = tmp_gi;

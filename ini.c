@@ -22,8 +22,9 @@ extern OPTION_INFO op;
 BOOL ini_get_option(const TCHAR *ini_path)
 {
 	RECT rect;
-//	TCHAR buf[BUF_SIZE];
+	TCHAR buf[BUF_SIZE];
 	WORD lang;
+	int i, j;
 
 	profile_initialize(ini_path, TRUE);
 
@@ -39,14 +40,34 @@ BOOL ini_get_option(const TCHAR *ini_path)
 		op.window_rect.left = 0;
 		op.window_rect.top = 0;
 	}
+	op.window_state = profile_get_int(TEXT("window"), TEXT("state"), SW_SHOWDEFAULT, ini_path);
+
+	// view
+	op.view_left = profile_get_int(TEXT("view"), TEXT("left"), 1, ini_path);
 
 	// game option
 	op.gi.start_score = profile_get_int(TEXT("game"), TEXT("start_score"), 501, ini_path);
-	op.window_state = profile_get_int(TEXT("window"), TEXT("state"), SW_SHOWDEFAULT, ini_path);
-	op.view_left = profile_get_int(TEXT("view"), TEXT("left"), 1, ini_path);
-
 	op.gi.round_limit = profile_get_int(TEXT("game"), TEXT("round_limit"), ((lang != LANG_JAPANESE) ? 0 : 1), ini_path);
 	op.gi.round = profile_get_int(TEXT("game"), TEXT("round"), 15, ini_path);
+
+	profile_get_string(TEXT("game"), TEXT("p1_name"), message_get_res(IDS_STRING_PLAYER1), op.gi.player_name[0], NAME_SIZE - 1, ini_path);
+//	op.gi.player_start_score[0] = profile_get_int(TEXT("game"), TEXT("p1_start_score"), 0, ini_path);
+//	op.gi.com[0] = profile_get_int(TEXT("game"), TEXT("p1_com"), FALSE, ini_path);
+//	op.gi.level[0] = profile_get_int(TEXT("game"), TEXT("p1_com_level"), 0, ini_path);
+
+	profile_get_string(TEXT("game"), TEXT("p2_name"), message_get_res(IDS_STRING_PLAYER2), op.gi.player_name[1], NAME_SIZE - 1, ini_path);
+//	op.gi.player_start_score[1] = profile_get_int(TEXT("game"), TEXT("p2_start_score"), 0, ini_path);
+//	op.gi.com[1] = profile_get_int(TEXT("game"), TEXT("p2_com"), FALSE, ini_path);
+//	op.gi.level[1] = profile_get_int(TEXT("game"), TEXT("p2_com_level"), 0, ini_path);
+
+	op.name_list_count = profile_get_int(TEXT("game"), TEXT("name_list_count"), 0, ini_path);
+	if (op.name_list_count > NAME_LIST_COUNT) {
+		op.name_list_count = NAME_LIST_COUNT;
+	}
+	for (i = 0; i < op.name_list_count; i++) {
+		wsprintf(buf, TEXT("name_list_%d"), i);
+		profile_get_string(TEXT("game"), buf, TEXT(""), op.name_list[i], NAME_SIZE - 1, ini_path);
+	}
 
 	profile_get_string(TEXT("font"), TEXT("name"), message_get_res(IDS_STRING_DEFAULT_FONT), op.font_name, BUF_SIZE - 1, ini_path);
 	op.left_font_size = profile_get_int(TEXT("font"), TEXT("left_font_size"), 40, ini_path);
