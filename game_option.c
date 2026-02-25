@@ -90,6 +90,13 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 					EnableWindow(GetDlgItem(hDlg, IDC_EDIT_SCORE), TRUE);
 				break;
 			}
+
+			if (gi->round_limit == 1) {
+				CheckDlgButton(hDlg, IDC_CHECK_ROUND_LIMIT, BST_CHECKED);
+			}
+			SetDlgItemInt(hDlg, IDC_EDIT_ROUND, gi->round, FALSE);
+			SendMessage(hDlg, WM_COMMAND, IDC_CHECK_ROUND_LIMIT, 0);
+
 			break;
 
 		case WM_CLOSE:
@@ -114,6 +121,15 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 						SetDlgItemInt(hDlg, IDC_EDIT_ROUND, MAX_ROUND, FALSE);
 					}
 					break;
+
+				case IDC_CHECK_ROUND_LIMIT:
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_ROUND_LIMIT) == BST_CHECKED) {
+						EnableWindow(GetDlgItem(hDlg, IDC_EDIT_ROUND), TRUE);
+					} else {
+						EnableWindow(GetDlgItem(hDlg, IDC_EDIT_ROUND), FALSE);
+					}
+					break;
+
 
 				case IDCANCEL:
 					SendMessage(hDlg, WM_CLOSE, 0, 0);
@@ -144,6 +160,18 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 						if (gi->start_score > 99999) {
 							gi->start_score = 99999;
 						}
+					}
+
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_ROUND_LIMIT) == BST_CHECKED) {
+						gi->round_limit = 1;
+					}
+
+					gi->round = GetDlgItemInt(hDlg, IDC_EDIT_ROUND, NULL, FALSE);
+					if (gi->round < 1) { 
+						gi->round = 1; 
+					}
+					if (gi->round > 9999 / 3) { 
+						gi->round = 9999 / 3; 
 					}
 
 					if(LOWORD(wParam) == IDC_BUTTON_SAVE) {

@@ -81,6 +81,11 @@ BOOL score_info_init(const HWND hWnd, SCORE_INFO *si, GAME_INFO *gi, const BOOL 
 			} else if (si->player[i].stat.long_game > si->player[i].set_stat.long_game) {
 				si->player[i].set_stat.long_game = si->player[i].stat.long_game;
 			}
+
+			// Avg score
+			si->player[i].set_stat.all_score += si->player[i].stat.all_score;
+			si->player[i].set_stat.all_darts += si->player[i].stat.all_darts;
+
 		
 		}
 		

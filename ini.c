@@ -45,6 +45,9 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	op.window_state = profile_get_int(TEXT("window"), TEXT("state"), SW_SHOWDEFAULT, ini_path);
 	op.view_left = profile_get_int(TEXT("view"), TEXT("left"), 1, ini_path);
 
+	op.gi.round_limit = profile_get_int(TEXT("game"), TEXT("round_limit"), ((lang != LANG_JAPANESE) ? 0 : 1), ini_path);
+	op.gi.round = profile_get_int(TEXT("game"), TEXT("round"), 15, ini_path);
+
 	profile_get_string(TEXT("font"), TEXT("name"), message_get_res(IDS_STRING_DEFAULT_FONT), op.font_name, BUF_SIZE - 1, ini_path);
 	op.left_font_size = profile_get_int(TEXT("font"), TEXT("left_font_size"), 40, ini_path);
 
@@ -57,8 +60,8 @@ BOOL ini_get_option(const TCHAR *ini_path)
 
 BOOL ini_put_option(const TCHAR *ini_path)
 {
-//	TCHAR buf[BUF_SIZE];
-//	int i;
+	TCHAR buf[BUF_SIZE];
+	int i;
 
 	profile_initialize(ini_path, TRUE);
 
@@ -68,11 +71,17 @@ BOOL ini_put_option(const TCHAR *ini_path)
 	profile_write_int(TEXT("window"), TEXT("bottom"), op.window_rect.bottom, ini_path);
 	profile_write_int(TEXT("window"), TEXT("state"), op.window_state, ini_path);
 
+	profile_write_int(TEXT("game"), TEXT("name_list_count"), op.name_list_count, ini_path);
+	for (i = 0; i < op.name_list_count; i++) {
+		wsprintf(buf, TEXT("name_list_%d"), i);
+		profile_write_string(TEXT("game"), buf, op.name_list[i], ini_path);
+	}
 
 	profile_write_int(TEXT("view"), TEXT("left"), op.view_left, ini_path);
 
 	profile_write_string(TEXT("font"), TEXT("name"), op.font_name, ini_path);
 	profile_write_int(TEXT("font"), TEXT("left_font_size"), op.left_font_size, ini_path);
+
 
 	// Player Information
 	profile_write_int(TEXT("player"), TEXT("large_font"), op.opi.large_font, ini_path);
@@ -86,6 +95,9 @@ BOOL ini_put_game_option(const TCHAR *ini_path)
 {
 	profile_initialize(ini_path, TRUE);
 	profile_write_int(TEXT("game"), TEXT("start_score"), op.gi.start_score, ini_path);
+
+	profile_write_int(TEXT("game"), TEXT("round_limit"), op.gi.round_limit, ini_path);
+	profile_write_int(TEXT("game"), TEXT("round"), op.gi.round, ini_path);
 
 	profile_flush(ini_path);
 	profile_free();
