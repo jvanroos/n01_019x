@@ -126,10 +126,27 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 			}
 			SetDlgItemInt(hDlg, IDC_EDIT_ROUND, gi->round, FALSE);
 			SendMessage(hDlg, WM_COMMAND, IDC_CHECK_ROUND_LIMIT, 0);
+			
+			// Leg
+			if (gi->leg_limit == 1) {
+				CheckDlgButton(hDlg, IDC_CHECK_LEG_LIMIT, BST_CHECKED);
+			}
+			SetDlgItemInt(hDlg, IDC_EDIT_LEG, gi->max_leg, FALSE);
 
+			// Best of ...
+			if (gi->best_of == 1) {
+				CheckDlgButton(hDlg, IDC_CHECK_BEST_OF, BST_CHECKED);
+			}
+
+			// First
+			if (gi->change_first == 1) {
+				CheckDlgButton(hDlg, IDC_CHECK_CHANGE_FIRST, BST_CHECKED);
+			}
+			SendMessage(hDlg, WM_COMMAND, IDC_CHECK_LEG_LIMIT, 0);
 
 			SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, CB_SETEXTENDEDUI, TRUE, 0);
 			SendDlgItemMessage(hDlg, IDC_COMBO_P2_NAME, CB_SETEXTENDEDUI, TRUE, 0);
+
 			for (i = 0; i < op.name_list_count; i++) {
 				if (*op.name_list[i] != TEXT('\0')) {
 					SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, CB_ADDSTRING, 0, (LPARAM)op.name_list[i]);
@@ -242,9 +259,25 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 
 				// Names
 					SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, WM_GETTEXT, NAME_SIZE - 1, (LPARAM)gi->player_name[0]);
-					SendDlgItemMessage(hDlg, IDC_COMBO_P1_NAME, WM_GETTEXT, NAME_SIZE - 1, (LPARAM)gi->player_name[1]);
+					SendDlgItemMessage(hDlg, IDC_COMBO_P2_NAME, WM_GETTEXT, NAME_SIZE - 1, (LPARAM)gi->player_name[1]);
 					add_name_list(gi->player_name[1]);
 					add_name_list(gi->player_name[0]);
+
+					gi->player_start_score[0] = gi->start_score;
+					gi->player_start_score[1] = gi->start_score;
+
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_P1_SCORE) == BST_CHECKED) {
+						gi->player_start_score[0] = GetDlgItemInt(hDlg, IDC_EDIT_P1_SCORE, NULL, FALSE);
+						if (gi->player_start_score[0] < 2 || gi->player_start_score[0] > 99999) {
+							gi->player_start_score[0] = gi->start_score;
+						}
+					}
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_P2_SCORE) == BST_CHECKED) {
+						gi->player_start_score[1] = GetDlgItemInt(hDlg, IDC_EDIT_P2_SCORE, NULL, FALSE);
+						if (gi->player_start_score[1] < 2 || gi->player_start_score[1] > 99999) {
+							gi->player_start_score[1] = gi->start_score;
+						}
+					}
 
 				// Save
 					if(LOWORD(wParam) == IDC_BUTTON_SAVE) {

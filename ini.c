@@ -51,14 +51,14 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	op.gi.round = profile_get_int(TEXT("game"), TEXT("round"), 15, ini_path);
 
 	profile_get_string(TEXT("game"), TEXT("p1_name"), message_get_res(IDS_STRING_PLAYER1), op.gi.player_name[0], NAME_SIZE - 1, ini_path);
-//	op.gi.player_start_score[0] = profile_get_int(TEXT("game"), TEXT("p1_start_score"), 0, ini_path);
-//	op.gi.com[0] = profile_get_int(TEXT("game"), TEXT("p1_com"), FALSE, ini_path);
-//	op.gi.level[0] = profile_get_int(TEXT("game"), TEXT("p1_com_level"), 0, ini_path);
+	op.gi.player_start_score[0] = profile_get_int(TEXT("game"), TEXT("p1_start_score"), 0, ini_path);
+	op.gi.com[0] = profile_get_int(TEXT("game"), TEXT("p1_com"), FALSE, ini_path);
+	op.gi.level[0] = profile_get_int(TEXT("game"), TEXT("p1_com_level"), 0, ini_path);
 
 	profile_get_string(TEXT("game"), TEXT("p2_name"), message_get_res(IDS_STRING_PLAYER2), op.gi.player_name[1], NAME_SIZE - 1, ini_path);
-//	op.gi.player_start_score[1] = profile_get_int(TEXT("game"), TEXT("p2_start_score"), 0, ini_path);
-//	op.gi.com[1] = profile_get_int(TEXT("game"), TEXT("p2_com"), FALSE, ini_path);
-//	op.gi.level[1] = profile_get_int(TEXT("game"), TEXT("p2_com_level"), 0, ini_path);
+	op.gi.player_start_score[1] = profile_get_int(TEXT("game"), TEXT("p2_start_score"), 0, ini_path);
+	op.gi.com[1] = profile_get_int(TEXT("game"), TEXT("p2_com"), FALSE, ini_path);
+	op.gi.level[1] = profile_get_int(TEXT("game"), TEXT("p2_com_level"), 0, ini_path);
 
 	op.name_list_count = profile_get_int(TEXT("game"), TEXT("name_list_count"), 0, ini_path);
 	if (op.name_list_count > NAME_LIST_COUNT) {
@@ -115,10 +115,25 @@ BOOL ini_put_option(const TCHAR *ini_path)
 BOOL ini_put_game_option(const TCHAR *ini_path) 
 {
 	profile_initialize(ini_path, TRUE);
-	profile_write_int(TEXT("game"), TEXT("start_score"), op.gi.start_score, ini_path);
 
+	profile_write_int(TEXT("game"), TEXT("start_score"), op.gi.start_score, ini_path);
 	profile_write_int(TEXT("game"), TEXT("round_limit"), op.gi.round_limit, ini_path);
 	profile_write_int(TEXT("game"), TEXT("round"), op.gi.round, ini_path);
+
+	profile_write_int(TEXT("game"), TEXT("leg_limit"), op.gi.leg_limit, ini_path);
+	profile_write_int(TEXT("game"), TEXT("max_leg"), op.gi.max_leg, ini_path);
+	profile_write_int(TEXT("game"), TEXT("best_of"), op.gi.best_of, ini_path);
+	profile_write_int(TEXT("game"), TEXT("change_first"), op.gi.change_first, ini_path);
+
+	profile_write_string(TEXT("game"), TEXT("p1_name"), op.gi.player_name[0], ini_path);
+	profile_write_int(TEXT("game"), TEXT("p1_start_score"), op.gi.player_start_score[0], ini_path);
+	profile_write_int(TEXT("game"), TEXT("p1_com"), op.gi.com[0], ini_path);
+	profile_write_int(TEXT("game"), TEXT("p1_com_level"), op.gi.level[0], ini_path);
+
+	profile_write_string(TEXT("game"), TEXT("p2_name"), op.gi.player_name[1], ini_path);
+	profile_write_int(TEXT("game"), TEXT("p2_start_score"), op.gi.player_start_score[1], ini_path);
+	profile_write_int(TEXT("game"), TEXT("p2_com"), op.gi.com[1], ini_path);
+	profile_write_int(TEXT("game"), TEXT("p2_com_level"), op.gi.level[1], ini_path);
 
 	profile_flush(ini_path);
 	profile_free();
