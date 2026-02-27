@@ -3,16 +3,17 @@
 
 
 /* Define */
-#define BUF_SIZE						256
-#define NAME_SIZE						64
-#define APP_NAME						TEXT("n01 Ver 0.1.9")
+#define BUF_SIZE					256
+#define NAME_SIZE					64
+#define APP_NAME					TEXT("n01 Ver 0.1.9")
 #define APP_VERSION					18
 
 
-#define MAX_ROUND						60
+#define MAX_ROUND					60
+#define ALLOC_ROUND					10
 #define NAME_LIST_COUNT				64
 
-#define WM_WINDOW_REDRAW				(WM_APP + 1)
+#define WM_WINDOW_REDRAW			(WM_APP + 1)
 #define WM_WINDOW_SET_CURRENT		(WM_APP + 8)
 #define WM_N01_GAME_ON				(WM_APP + 531)
 
