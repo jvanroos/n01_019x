@@ -79,8 +79,11 @@ FONT 10, "MS Sans Serif"
 
 STRINGTABLE DISCARDABLE
 {
-  IDS_STRING_DEFAULT_FONT, "Arial"
-  IDS_STRING_OP_GAME_SAVE, "The present option was saved."
+  	IDS_STRING_DEFAULT_FONT, "Arial"
+  	IDS_STRING_OP_GAME_SAVE, "The present option was saved."
+	IDS_STRING_OP_NAME      "Name:"
+	IDS_STRING_OP_LEVEL_TITLE "Level:"
+	IDS_STRING_OP_LEVEL     "Level %d"
 }
 
 STRINGTABLE DISCARDABLE 

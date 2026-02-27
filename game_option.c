@@ -18,6 +18,13 @@
 
 #include "resource.h"
 
+/* Define */
+#ifdef _DEBUG
+#define ROBO_MAX_LEVEL			13
+#else
+#define ROBO_MAX_LEVEL			12
+#endif
+
 /* Global Variables */
 extern OPTION_INFO op;
 extern TCHAR ini_path[MAX_PATH];
@@ -162,6 +169,33 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 				SendDlgItemMessage(hDlg, IDC_COMBO_P2_NAME, WM_SETTEXT, 0,
 					(LPARAM)((*gi->player_name[1] != TEXT('\0')) ? gi->player_name[1] : message_get_res(IDS_STRING_PLAYER2)));
 			}
+
+			// COM
+			for (i = 0; i < ROBO_MAX_LEVEL; i++) {
+				wsprintf(buf, message_get_res(IDS_STRING_OP_LEVEL), i + 1);
+				SendDlgItemMessage(hDlg, IDC_COMBO_COM1, CB_ADDSTRING, 0, (LPARAM)buf);
+			}
+			SendDlgItemMessage(hDlg, IDC_COMBO_COM1, CB_SETCURSEL, 0, 0);
+			for (i = 0; i < ROBO_MAX_LEVEL; i++) {
+				wsprintf(buf, message_get_res(IDS_STRING_OP_LEVEL), i + 1);
+				SendDlgItemMessage(hDlg, IDC_COMBO_COM2, CB_ADDSTRING, 0, (LPARAM)buf);
+			}
+			SendDlgItemMessage(hDlg, IDC_COMBO_COM2, CB_SETCURSEL, 0, 0);
+			if (gi->com[0] == TRUE) {
+				CheckDlgButton(hDlg, IDC_CHECK_COM1, BST_CHECKED);
+				SendDlgItemMessage(hDlg, IDC_COMBO_COM1, CB_SETCURSEL, gi->level[0], 0);
+				ShowWindow(GetDlgItem(hDlg, IDC_COMBO_P1_NAME), SW_HIDE);
+				ShowWindow(GetDlgItem(hDlg, IDC_COMBO_COM1), SW_SHOW);
+				SetWindowText(GetDlgItem(hDlg, IDC_STATIC_P1), message_get_res(IDS_STRING_OP_LEVEL_TITLE));
+			}
+			if (gi->com[1] == TRUE) {
+				CheckDlgButton(hDlg, IDC_CHECK_COM2, BST_CHECKED);
+				SendDlgItemMessage(hDlg, IDC_COMBO_COM2, CB_SETCURSEL, gi->level[1], 0);
+				ShowWindow(GetDlgItem(hDlg, IDC_COMBO_P2_NAME), SW_HIDE);
+				ShowWindow(GetDlgItem(hDlg, IDC_COMBO_COM2), SW_SHOW);
+				SetWindowText(GetDlgItem(hDlg, IDC_STATIC_P2), message_get_res(IDS_STRING_OP_LEVEL_TITLE));
+			}
+
 			break;
 
 		case WM_CLOSE:

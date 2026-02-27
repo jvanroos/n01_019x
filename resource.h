@@ -59,3 +59,8 @@
 #define IDS_STRING_OP_GAME_SAVE  		10003
 #define IDS_STRING_PLAYER1              10004
 #define IDS_STRING_PLAYER2              10005
+#define IDS_STRING_OP_LEVEL_TITLE       10006
+#define IDS_STRING_OP_LEVEL             10007
+#define IDS_STRING_OP_NAME              10008
+
+
