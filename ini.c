@@ -98,11 +98,16 @@ BOOL ini_put_option(const TCHAR *ini_path)
 		profile_write_string(TEXT("game"), buf, op.name_list[i], ini_path);
 	}
 
+	profile_write_int(TEXT("view"), TEXT("player"), op.view_player, ini_path);
 	profile_write_int(TEXT("view"), TEXT("left"), op.view_left, ini_path);
 
 	profile_write_string(TEXT("font"), TEXT("name"), op.font_name, ini_path);
 	profile_write_int(TEXT("font"), TEXT("left_font_size"), op.left_font_size, ini_path);
-
+	profile_write_int(TEXT("view"), TEXT("guide"), op.view_guide, ini_path);
+	profile_write_int(TEXT("view"), TEXT("throw_count"), op.view_throw_count, ini_path);
+	profile_write_int(TEXT("view"), TEXT("ton_circle"), op.view_ton_circle, ini_path);
+	profile_write_int(TEXT("view"), TEXT("separate"), op.view_separate, ini_path);
+	profile_write_int(TEXT("view"), TEXT("scroll_bar"), op.view_scroll_bar, ini_path);
 
 	// Player Information
 	profile_write_int(TEXT("player"), TEXT("large_font"), op.opi.large_font, ini_path);

@@ -160,13 +160,13 @@ BOOL score_info_init(const HWND hWnd, SCORE_INFO *si, GAME_INFO *gi, const BOOL 
 		MessageBox(hWnd, err_str, APP_NAME, MB_ICONERROR);
 		return FALSE;
 	}
-*/
+
 	if (gi->change_first == TRUE && si->current_set != 0) {
 		si->leg[0].first = !first;
 	}
 	si->leg[0].alloc_round = (si->round_limit == 0) ? ALLOC_ROUND : si->round;
 	si->leg[0].max_round = (si->round_limit == 0) ? 1 : si->round;
-/*
+
 	si->leg[0].score[0] = (TYPE_SCORE *)mem_calloc(sizeof(TYPE_SCORE) * (si->leg[0].alloc_round + 1));
 	if (si->leg[0].score[0] == NULL) {
 		message_get_error(GetLastError(), err_str);
