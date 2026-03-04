@@ -26,20 +26,41 @@ typedef struct _DRAW_BUFFER {
 	int height;
 
 	HDC draw_dc;
+	HBITMAP draw_bmp;
+	HBITMAP draw_ret_bmp;
+	int bmp_height;
 
 	HDC name_dc;
 	HBITMAP name_bmp;
 	HBITMAP name_ret_bmp;
-	int bmp_height;
+	int name_height;
 
 	HFONT name_font;
 	HFONT info_font;
+	int font_width;
+	int font_height;
+	HFONT small_font;
+	int small_font_height;
+	HFONT large_font;
+	int large_font_height;
+
+	int height_margin;
 
 	HBRUSH back_brush;
 	HBRUSH name_back_brush;
 
-	PLAYER_INFO *pi;
+	BOOL first;
+	BOOL set_mode;
+	BOOL lock;
+	BOOL show_all;
+	BOOL history;
+	BOOL option;
 
+	BOOL top_button;
+	BOOL bottom_button;
+
+	PLAYER_INFO *pi;
+	STATISTICS_INFO *set_stat;
 } DRAW_BUFFER;
 
 /* Local Function Prototypes */
@@ -53,6 +74,7 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf) {
 
 static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static STATISTICS_INFO tmp_stat;
 	DRAW_BUFFER *bf;
 	PLAYER_INFO *pi;
 	HDC hdc;
@@ -62,12 +84,27 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 
 	switch(msg) {
 		case WM_CREATE:
+			// retrieve PLAYER_INFO from LPARAM
 			pi = (PLAYER_INFO *)((CREATESTRUCT *)lParam)->lpCreateParams;
+
+			// Reserve space for the draw buffer
 			bf = (DRAW_BUFFER *)mem_calloc(sizeof(DRAW_BUFFER));
 			if(bf == NULL) {
 				return -1;
 			}
+
+			// copy PLAYER_INFO to buffer->player_info
 			bf->pi = pi;
+
+			if (bf->pi != NULL) {
+				bf->set_stat = &bf->pi->set_stat;
+			} else {
+				bf->set_stat = &tmp_stat;
+			}
+
+			if (op.opi.scroll == 0) {
+				bf->lock = TRUE;
+			}
 
 			hdc = GetDC(hWnd);
 			bf->draw_dc = CreateCompatibleDC(hdc);
@@ -86,6 +123,18 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 
 		case WM_CLOSE:
 			DestroyWindow(hWnd);
+			break;
+
+		case WM_DESTROY:
+			break;
+
+		case WM_SIZE:
+			break;
+
+		case WM_PAINT:
+			break;
+
+		case WM_PLAYER_REDRAW:
 			break;
 
 		default:
