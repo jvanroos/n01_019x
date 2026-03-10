@@ -13,6 +13,7 @@
 
 /* Define */
 #define WM_PLAYER_REDRAW			(WM_APP + 300)
+#define WM_PLAYER_DRAW_INIT			(WM_APP + 301)
 #define WM_PLAYER_SET_MODE			(WM_APP + 303)
 
 /* Struct */

@@ -17,6 +17,12 @@
 /* Define */
 #define WINDOW_CLASS	TEXT("score_player_wnd")
 
+#define CHAR_COUNT		10
+#define LARGE_COUNT		6
+#define HISTORY_COUNT	14
+
+#define CHAR_MIN_SIZE	9
+
 /* Global Variables */
 extern HINSTANCE hInst;
 extern OPTION_INFO op;
@@ -68,7 +74,31 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf);
 
 static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
 
-static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf) {
+static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf) 
+{
+	HDC hdc;
+	RECT rect;
+	HFONT ret_font;
+	TEXTMETRIC tm;
+	int font_size;
+	int small_font_size;
+	int large_font_size;
+	int char_count;
+
+	// Get Client rectangle 
+	GetClientRect(hWnd, &rect);
+	hdc = GetDC(hWnd);
+
+	if (bf->history == TRUE) {
+		char_count = HISTORY_COUNT;
+	} else {
+		char_count = CHAR_COUNT;
+	}
+
+	if (op.opi.name != 0 || bf->show_all == TRUE) {
+		font_size = (rect.right / char_count < CHAR_MIN_SIZE) ? CHAR_MIN_SIZE : rect.right / char_count;
+	}
+	
 	return TRUE;
 }
 
@@ -112,14 +142,15 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			ReleaseDC(hWnd, hdc);
 			bf->back_brush = CreateSolidBrush(RGB(255,255,255)); // TO DO: change to op.ci.player_background
 			bf->name_back_brush = CreateSolidBrush(RGB(255,0,0)); // TO DO: op.ci.player_name_background
+			
+			// draw_init(hWnd, bf);
+			// draw_player(hWnd, bf);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
 			break;
 
 		case WM_PLAYER_SET_MODE:
-
 			break;
-
 
 		case WM_CLOSE:
 			DestroyWindow(hWnd);
@@ -135,6 +166,9 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			break;
 
 		case WM_PLAYER_REDRAW:
+			break;
+
+		case WM_PLAYER_DRAW_INIT:
 			break;
 
 		default:
