@@ -97,6 +97,13 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 
 	if (op.opi.name != 0 || bf->show_all == TRUE) {
 		font_size = (rect.right / char_count < CHAR_MIN_SIZE) ? CHAR_MIN_SIZE : rect.right / char_count;
+		bf->name_font = font_create_menu(font_size, FW_BOLD, FALSE);
+		ret_font = SelectObject(hdc, bf->name_font);
+		GetTextMetrics(hdc, &tm);
+		bf->name_height = tm.tmHeight + tm.tmHeight / 8;
+		SelectObject(hdc, ret_font);
+
+		bf->name_bmp = CreateCompatibleBitmap(hdc, rect.right, bf->name_height);
 	}
 	
 	return TRUE;

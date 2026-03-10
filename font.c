@@ -45,3 +45,32 @@ HFONT font_create(const TCHAR *FontName, const int FontSize, const int weight, c
 	lstrcpy(lf.lfFaceName, FontName);
 	return CreateFontIndirect((CONST LOGFONT *)&lf);
 }
+
+/*
+ * font_create_menu
+ */
+HFONT font_create_menu(const int FontSize, const int weight, const BOOL under_line)
+{
+	NONCLIENTMETRICS ncMetrics;
+	HDC hdc;
+
+	ZeroMemory(&ncMetrics, sizeof(NONCLIENTMETRICS));
+	ncMetrics.cbSize = sizeof(NONCLIENTMETRICS);
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncMetrics, 0);
+
+	if (FontSize > 0) {
+		hdc = GetDC(NULL);
+		ncMetrics.lfMenuFont.lfHeight = -(int)((FontSize * GetDeviceCaps(hdc, LOGPIXELSY)) / 72);
+		ReleaseDC(NULL, hdc);
+	}
+
+	if (weight > 0) {
+		ncMetrics.lfMenuFont.lfWeight = weight;
+	}
+
+	ncMetrics.lfMenuFont.lfUnderline = (BYTE)under_line;
+
+	return CreateFontIndirect(&ncMetrics.lfMenuFont);
+}
+/* End of source */
+
