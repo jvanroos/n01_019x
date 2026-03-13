@@ -48,7 +48,8 @@
 #define IDC_SPIN_P2_SCORE               1101
 #define IDC_CHECK_CHANGE_FIRST          1105
 
-#define ID_MENUITEM_SHOW_LEFT  			6001
+#define ID_MENUITEM_SHOW_LEFT  			40013
+#define ID_MENUITEM_SHOW_PLAYER  		40014
 #define ID_MENUITEM_NEW_GAME            40016
 #define ID_MENUITEM_EXIT                40017
 #define ID_MENUITEM_ABOUT               40024
@@ -62,5 +63,6 @@
 #define IDS_STRING_OP_LEVEL_TITLE       10006
 #define IDS_STRING_OP_LEVEL             10007
 #define IDS_STRING_OP_NAME              10008
+#define IDS_STRING_COM                  10009
 
 

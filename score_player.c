@@ -22,6 +22,7 @@
 #define HISTORY_COUNT	14
 
 #define CHAR_MIN_SIZE	9
+#define SCROLL_HEIGHT	bf->name_height
 
 /* Global Variables */
 extern HINSTANCE hInst;
@@ -71,6 +72,9 @@ typedef struct _DRAW_BUFFER {
 
 /* Local Function Prototypes */
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf);
+static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf);
+static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf);
+//static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf);
 
 static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -104,8 +108,81 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 		SelectObject(hdc, ret_font);
 
 		bf->name_bmp = CreateCompatibleBitmap(hdc, rect.right, bf->name_height);
+		bf->name_ret_bmp = SelectObject(bf->name_dc, bf->name_bmp);
+		
+		draw_name(hWnd, bf);
+
+	} else {
+		bf->name_font = NULL;
+		bf->name_height = 0;
 	}
 	
+	return TRUE;
+}
+
+static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf) 
+{
+	RECT 	draw_rect, rect;
+	HFONT 	ret_font;
+	TCHAR 	buf[BUF_SIZE];
+
+	if (bf->pi == NULL) 
+	{
+		return FALSE;
+	}
+
+	if (op.opi.name != 0 || bf->show_all == TRUE) {
+		GetClientRect(hWnd, &rect);
+		SetRect(&draw_rect, 0, 0, rect.right, bf->name_height);
+		FillRect(bf->name_dc, &draw_rect, bf->name_back_brush);
+
+		ret_font = SelectObject(bf->name_dc, bf->name_font);
+		SetTextColor(bf->name_dc, RGB(255,255,255));	// TO DO: change to op.ci.player_name_text
+		SetBkColor(bf->name_dc, RGB(64,128,255));	// TO DO: change to op.ci.player_name_background
+		if (bf->pi->com == TRUE) {
+			wsprintf(buf, message_get_res(IDS_STRING_COM), bf->pi->level + 1);
+		} else {
+			lstrcpy(buf, bf->pi->name);
+		}
+		DrawText(bf->name_dc, buf, lstrlen(buf), &draw_rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+		SelectObject(bf->name_dc, ret_font);
+	}
+	return TRUE;
+}
+
+static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf)
+{	
+	if (bf->draw_dc != NULL) {
+		SelectObject(bf->draw_dc, bf->draw_ret_bmp);
+		DeleteObject(bf->draw_bmp);
+		bf->draw_bmp = NULL;
+	}
+
+	if (bf->name_dc != NULL) {
+		SelectObject(bf->name_dc, bf->draw_ret_bmp);
+		DeleteObject(bf->name_bmp);
+		bf->name_bmp = NULL;
+	}
+
+	if (bf->name_font != NULL) {
+		DeleteObject(bf->name_font);
+		bf->name_font = NULL;
+	}
+
+	if (bf->info_font != NULL) {
+		DeleteObject(bf->info_font);
+		bf->info_font = NULL;
+	}
+
+	if (bf->small_font != NULL) {
+		DeleteObject(bf->small_font);
+		bf->small_font = NULL;
+	}
+
+	if (bf->large_font != NULL) {
+		DeleteObject(bf->large_font);
+		bf->large_font = NULL;
+	}
 	return TRUE;
 }
 
@@ -150,13 +227,10 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			bf->back_brush = CreateSolidBrush(RGB(255,255,255)); // TO DO: change to op.ci.player_background
 			bf->name_back_brush = CreateSolidBrush(RGB(255,0,0)); // TO DO: op.ci.player_name_background
 			
-			// draw_init(hWnd, bf);
-			// draw_player(hWnd, bf);
+			draw_init(hWnd, bf);
+//			draw_player(hWnd, bf);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
-			break;
-
-		case WM_PLAYER_SET_MODE:
 			break;
 
 		case WM_CLOSE:
@@ -164,12 +238,66 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			break;
 
 		case WM_DESTROY:
-			break;
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf !=NULL) {
+				draw_free(hWnd, bf);
+				if (bf->draw_dc != NULL) {
+					DeleteDC(bf->draw_dc);
+					bf->draw_dc = NULL;
+				}
+				if (bf->name_dc != NULL) {
+					DeleteDC(bf->name_dc);
+					bf->name_dc = NULL;
+				}
+				DeleteObject(bf->back_brush);
+				DeleteObject(bf->name_back_brush);
+				mem_free((void *)&bf);
+			}
+			return DefWindowProc(hWnd, msg, wParam, lParam);
 
 		case WM_SIZE:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			draw_free(hWnd, bf);
+			draw_init(hWnd, bf);
+			// draw_player(hWnd, bf);
+			InvalidateRect(hWnd, NULL, FALSE);
+			UpdateWindow(hWnd);
 			break;
 
 		case WM_PAINT:
+			bf = (DRAW_BUFFER *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			hdc = BeginPaint(hWnd, &ps);
+			
+			if (ps.rcPaint.top < bf->name_height) {
+				BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, bf->name_height,
+					bf->name_dc, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
+				ps.rcPaint.top, bf->name_height;
+			}
+			BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom,
+				bf->draw_dc, ps.rcPaint.left, ps.rcPaint.top + bf->top - bf->name_height, SRCCOPY);
+		
+			if (bf->top_button == TRUE) {
+				GetClientRect(hWnd, &rect);
+				rect.top = bf->name_height;
+				rect.bottom = bf->name_height + SCROLL_HEIGHT;
+				DrawFrameControl(hdc, &rect, DFC_SCROLL, DFCS_SCROLLUP | ((GetAsyncKeyState(VK_LBUTTON) < 0) ? DFCS_PUSHED : 0));
+			}
+			
+			if (bf->bottom_button == TRUE) {
+				GetClientRect(hWnd, &rect);
+				rect.top = rect.bottom - SCROLL_HEIGHT;
+				DrawFrameControl(hdc, &rect, DFC_SCROLL, DFCS_SCROLLDOWN | ((GetAsyncKeyState(VK_LBUTTON) < 0) ? DFCS_PUSHED : 0));
+			}	
+			EndPaint(hWnd, &ps);
+			break;
+
+		case WM_PLAYER_SET_MODE:
 			break;
 
 		case WM_PLAYER_REDRAW:

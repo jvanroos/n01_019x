@@ -53,12 +53,18 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 	switch (msg) {
 		case WM_CREATE:
-			wi.hWnd = hWnd;
-			si.player[0].start_score = 501;
-			wi.score_left_wnd[0] = score_left_create(hInst, hWnd, 0, &si.player[0]);
 
-			si.player[1].start_score = 501;
+			wi.hWnd = hWnd;
+			wi.score_left_wnd[0] = score_left_create(hInst, hWnd, 0, &si.player[0]);
 			wi.score_left_wnd[1] = score_left_create(hInst, hWnd, 0, &si.player[1]);
+			wi.score_player_wnd[0] = score_player_create(hInst, hWnd, 0, &si.player[0]);
+			wi.score_player_wnd[1] = score_player_create(hInst, hWnd, 0, &si.player[1]);
+
+			if (op.view_player == 1) {
+				CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_PLAYER, MF_CHECKED);
+				ShowWindow(wi.score_player_wnd[0], SW_SHOW);
+				ShowWindow(wi.score_player_wnd[1], SW_SHOW);
+			}
 
 			if (op.view_left == 1) {
 				CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, MF_CHECKED);
@@ -68,6 +74,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				// TO DO: replace this to ID_MENU_ITEM_OPTION 
 				SendMessage(wi.score_left_wnd[0], WM_LEFT_DRAW_INIT, 0, 0);
 			}
+
 			break;
 
 		case WM_EXITSIZEMOVE:
@@ -97,6 +104,16 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				MoveWindow(wi.score_left_wnd[1], rect.right / 2 + 2, rect.bottom - left_height - guide_height,
 					rect.right / 2 - 2, left_height, TRUE);
 				left_height += 4;
+			}
+
+			if (op.view_player == 1) {
+				i = (rect.right * 100) / 5;
+				MoveWindow(wi.score_player_wnd[0], 0, 0,
+					i / 100, rect.bottom - left_height - guide_height, TRUE);
+				MoveWindow(wi.score_player_wnd[1], i * 4 / 100, 0,
+					i / 100, rect.bottom - left_height - guide_height, TRUE);
+				left = i / 100 + 4;
+				right = i * 3 / 100 - 8;
 			}
 			break;
 
@@ -128,7 +145,15 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 					ShowWindow(wi.score_left_wnd[1], (op.view_left == 1) ? SW_SHOW : SW_HIDE);
 					CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_LEFT, (op.view_left == 1) ? MF_CHECKED : MF_UNCHECKED); 
 					SendMessage(hWnd, WM_SIZE, 0, 0);
-					break;  			
+					break;  
+
+				case ID_MENUITEM_SHOW_PLAYER:
+					op.view_player = !op.view_player;
+					ShowWindow(wi.score_player_wnd[0], (op.view_player == 1) ? SW_SHOW : SW_HIDE);
+					ShowWindow(wi.score_player_wnd[1], (op.view_player == 1) ? SW_SHOW : SW_HIDE);
+					CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_PLAYER, (op.view_player == 1) ? MF_CHECKED : MF_UNCHECKED);
+					SendMessage(hWnd, WM_SIZE, 0, 0);
+					break;			
 
 				case WM_WINDOW_SET_CURRENT:
 					SendMessage(wi.score_left_wnd[wParam], WM_LEFT_SET_CURRENT, TRUE, 0);
