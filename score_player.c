@@ -74,7 +74,7 @@ typedef struct _DRAW_BUFFER {
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf);
 static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf);
 static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf);
-//static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf);
+static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf);
 
 static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -147,6 +147,41 @@ static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf)
 		DrawText(bf->name_dc, buf, lstrlen(buf), &draw_rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 		SelectObject(bf->name_dc, ret_font);
 	}
+	return TRUE;
+}
+
+static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf) {
+	
+	RECT draw_rect, rect;
+	HFONT ret_font;
+	SIZE sz;
+	TCHAR buf[BUF_SIZE];
+	int left, right;
+	int title_left;
+	int height = 0;
+	int i, j;
+
+	GetClientRect(hWnd, &rect);
+	rect.bottom = bf->bmp_height;
+	FillRect(bf->draw_dc, &rect, bf->back_brush);
+
+	if (bf->pi == NULL) {
+		return FALSE;
+	}
+
+	SetTextColor(bf->draw_dc, RGB(0, 0, 0));
+	SetBkColor(bf->draw_dc, RGB(100, 150, 200));
+	ret_font = SelectObject(bf->draw_dc, bf->info_font);
+
+	if (op.opi.first != 0 && bf->show_all == FALSE) {
+		if (bf->first == 1) {
+			SetRect(&draw_rect, 0, height, rect.right, height + bf->font_height);
+			// draw_text(bf->draw_dc, message_get_res(IDS_STRING_P_FIRST), lstrlen(message_get_res(IDS_STRING_P_FIRST)), &draw_rect, DT_CENTER);
+		}
+		height += bf->font_height;
+	}
+
+
 	return TRUE;
 }
 
@@ -228,7 +263,7 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			bf->name_back_brush = CreateSolidBrush(RGB(255,0,0)); // TO DO: op.ci.player_name_background
 			
 			draw_init(hWnd, bf);
-//			draw_player(hWnd, bf);
+			draw_player(hWnd, bf);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
 			break;
@@ -262,7 +297,7 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			}
 			draw_free(hWnd, bf);
 			draw_init(hWnd, bf);
-			// draw_player(hWnd, bf);
+			draw_player(hWnd, bf);
 			InvalidateRect(hWnd, NULL, FALSE);
 			UpdateWindow(hWnd);
 			break;

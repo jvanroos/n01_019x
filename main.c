@@ -92,7 +92,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			left = 0;
 			right = rect.right;
 			left_height = 0;
-			guide_height = 0;
+			guide_height = 10;
 			
 			if (op.view_left == 1) {
 				left_height = SendMessage(wi.score_left_wnd[0], WM_LEFT_GET_HEIGHT, rect.right/2, (LPARAM)&i);
@@ -285,7 +285,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MSG msg;
 	HWND hWnd;
 	HANDLE hAccel;
-	TCHAR path[MAX_PATH];
+//	TCHAR path[MAX_PATH];
 	TCHAR err_str[MAX_PATH];
 
 	hInst = hInstance;
