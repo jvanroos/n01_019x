@@ -176,6 +176,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 		case WM_WINDOW_REDRAW:
 			SendMessage(wi.score_left_wnd[wParam], WM_LEFT_REDRAW, 0, 0);
+			SendMessage(wi.score_player_wnd[wParam], WM_PLAYER_REDRAW, 0, 0);
 			break;
 
 		case WM_N01_GAME_ON:
@@ -299,7 +300,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 	
-	if (score_left_regist(hInstance) == FALSE) {
+	if (score_left_regist(hInstance) == FALSE ||
+		score_player_regist(hInstance) == FALSE) {
 		message_get_error(GetLastError(), err_str);
 		MessageBox(NULL, err_str, APP_NAME, MB_ICONERROR);
 		return 0;

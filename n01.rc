@@ -89,5 +89,6 @@ STRINGTABLE
   IDS_STRING_OP_LEVEL, "Level %d"
   IDS_STRING_OP_NAME, "Name:"
   IDS_STRING_COM, "COM (lv.%d)"
+  IDS_STRING_P_FIRST, "- First -"
 }
 

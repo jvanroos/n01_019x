@@ -22,6 +22,10 @@
 #define HISTORY_COUNT	14
 
 #define CHAR_MIN_SIZE	9
+#define SMALL_MIN_SIZE	9
+#define LARGE_MIN_SIZE	14
+
+#define LEFT_MARGIN		(rect.right / 6)
 #define SCROLL_HEIGHT	bf->name_height
 
 /* Global Variables */
@@ -75,7 +79,7 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf);
 static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf);
 static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf);
 static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf);
-
+static int get_draw_height(const HWND hWnd, DRAW_BUFFER *bf, const BOOL arrange_flag);
 static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
 
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf) 
@@ -150,6 +154,37 @@ static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf)
 	return TRUE;
 }
 
+static int get_draw_height(const HWND hWnd, DRAW_BUFFER *bf, const BOOL arrange_flag) {
+	int height = 0;
+	int font_height;
+
+	return height;
+}
+
+
+static void draw_text(const HDC hdc, const TCHAR *str, const int len, const RECT *rect, const int format) {
+	SIZE sz;
+	int left, top;
+
+	GetTextExtentPoint32(hdc, str, len, &sz);
+	switch (format) {
+		case DT_LEFT:
+		default:
+			left = rect->left;
+			break;
+		
+		case DT_RIGHT:
+			left = rect->right - sz.cx;
+			break;
+
+		case DT_CENTER:
+			left = rect->left + (rect->right - rect->left - sz.cx) / 2;
+			break;
+	}
+	top = rect->top + (rect->bottom - rect->top - sz.cy) / 2;
+	TextOut(hdc, left, top, str, len);
+}
+
 static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf) {
 	
 	RECT draw_rect, rect;
@@ -169,14 +204,14 @@ static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf) {
 		return FALSE;
 	}
 
-	SetTextColor(bf->draw_dc, RGB(0, 0, 0));
-	SetBkColor(bf->draw_dc, RGB(100, 150, 200));
+	SetTextColor(bf->draw_dc, RGB(0, 0, 0));	// TO DO
+	SetBkColor(bf->draw_dc, RGB(100, 150, 200)); // TO DO 
 	ret_font = SelectObject(bf->draw_dc, bf->info_font);
 
 	if (op.opi.first != 0 && bf->show_all == FALSE) {
 		if (bf->first == 1) {
 			SetRect(&draw_rect, 0, height, rect.right, height + bf->font_height);
-			// draw_text(bf->draw_dc, message_get_res(IDS_STRING_P_FIRST), lstrlen(message_get_res(IDS_STRING_P_FIRST)), &draw_rect, DT_CENTER);
+			draw_text(bf->draw_dc, message_get_res(IDS_STRING_P_FIRST), lstrlen(message_get_res(IDS_STRING_P_FIRST)), &draw_rect, DT_CENTER);
 		}
 		height += bf->font_height;
 	}
@@ -336,6 +371,14 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			break;
 
 		case WM_PLAYER_REDRAW:
+			bf = (DRAW_BUFFER *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+
+			draw_player(hWnd, bf);
+			InvalidateRect(hWnd, NULL, FALSE);
+			UpdateWindow(hWnd);
 			break;
 
 		case WM_PLAYER_DRAW_INIT:
@@ -374,6 +417,9 @@ HWND score_player_create(const HINSTANCE hInstance, const HWND pWnd, int id, PLA
 		TEXT(""),
 		WS_BORDER | WS_CHILD,
 		0, 0, 0, 0,
-		pWnd, (HMENU)id, hInstance, pi);
+		pWnd, 
+		(HMENU)id, 
+		hInstance, pi);
+	
 	return hWnd;
 }

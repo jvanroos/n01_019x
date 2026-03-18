@@ -64,5 +64,7 @@
 #define IDS_STRING_OP_LEVEL             10007
 #define IDS_STRING_OP_NAME              10008
 #define IDS_STRING_COM                  10009
+#define IDS_STRING_P_FIRST              10010
+
 
 
