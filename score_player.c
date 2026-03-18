@@ -294,8 +294,8 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			bf->draw_dc = CreateCompatibleDC(hdc);
 			bf->name_dc = CreateCompatibleDC(hdc);
 			ReleaseDC(hWnd, hdc);
-			bf->back_brush = CreateSolidBrush(RGB(255,255,255)); // TO DO: change to op.ci.player_background
-			bf->name_back_brush = CreateSolidBrush(RGB(255,0,0)); // TO DO: op.ci.player_name_background
+			bf->back_brush = CreateSolidBrush(RGB(0,0,0)); // TO DO: change to op.ci.player_background
+			bf->name_back_brush = CreateSolidBrush(RGB(64,128,255)); // TO DO: op.ci.player_name_background
 			
 			draw_init(hWnd, bf);
 			draw_player(hWnd, bf);

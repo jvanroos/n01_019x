@@ -104,6 +104,9 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	// Player game information
 	op.opi.large_font = profile_get_int(TEXT("player"), TEXT("large_font"), 0, ini_path);
 
+	op.opi.name = profile_get_int(TEXT("player"), TEXT("name"), 1, ini_path);
+	op.opi.first = profile_get_int(TEXT("player"), TEXT("first"), 1, ini_path);
+
 	profile_free();
 	return TRUE;
 }
