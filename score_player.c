@@ -382,6 +382,25 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			break;
 
 		case WM_PLAYER_DRAW_INIT:
+			bf = (DRAW_BUFFER *) GetWindowLongPtr (hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			DeleteObject(bf->back_brush);
+			DeleteObject(bf->name_back_brush);
+			bf->back_brush = CreateSolidBrush(RGB(64, 128, 255));	// TO DO: replace with op.ci.player_background
+			bf->name_back_brush = CreateSolidBrush(RGB(255, 128, 64)); // TO DO: replace with op.ci.player_name_background
+			draw_free(hWnd, bf);
+			draw_init(hWnd, bf);
+			SendMessage(hWnd, WM_PLAYER_REDRAW, 0, 0);	
+			break;
+
+		case WM_WINDOW_SET_FIRST:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			bf->first = wParam;
 			break;
 
 		default:

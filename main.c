@@ -193,6 +193,16 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			SendMessage(wi.score_left_wnd[1], WM_LEFT_REDRAW, 1, 0);
 			break;
 
+		case WM_WINDOW_SET_FIRST:
+			SendMessage(wi.score_player_wnd[0], WM_WINDOW_SET_FIRST, (si.leg[si.current_leg].first == 0), 0);
+			SendMessage(wi.score_player_wnd[1], WM_WINDOW_SET_FIRST, (si.leg[si.current_leg].first == 1), 0);
+
+			if (wParam == TRUE) {
+				SendMessage(wi.score_player_wnd[0], WM_PLAYER_REDRAW, 0, 0);
+				SendMessage(wi.score_player_wnd[1], WM_PLAYER_REDRAW, 0, 0);
+			}
+			break;
+
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
