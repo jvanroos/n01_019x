@@ -65,3 +65,5 @@ dkms.conf
 #ini files
 *.ini
 
+#.git folder
+/.git
