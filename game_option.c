@@ -229,6 +229,30 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 					}
 					break;
 
+				case IDC_CHECK_COM1:
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_COM1) == BST_CHECKED) {
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_P1_NAME), SW_HIDE);
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_COM1), SW_SHOW);
+						SetWindowText(GetDlgItem(hDlg, IDC_STATIC_P1), message_get_res(IDS_STRING_OP_LEVEL_TITLE));
+					}else {
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_P1_NAME), SW_SHOW);
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_COM1), SW_HIDE);
+						SetWindowText(GetDlgItem(hDlg, IDC_STATIC_P1), message_get_res(IDS_STRING_OP_NAME));
+					}
+					break;
+
+				case IDC_CHECK_COM2:
+					if (IsDlgButtonChecked(hDlg, IDC_CHECK_COM2) == BST_CHECKED) {
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_P2_NAME), SW_HIDE);
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_COM2), SW_SHOW);
+						SetWindowText(GetDlgItem(hDlg, IDC_STATIC_P2), message_get_res(IDS_STRING_OP_LEVEL_TITLE));
+					}else {
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_P2_NAME), SW_SHOW);
+						ShowWindow(GetDlgItem(hDlg, IDC_COMBO_COM2), SW_HIDE);
+						SetWindowText(GetDlgItem(hDlg, IDC_STATIC_P2), message_get_res(IDS_STRING_OP_NAME));
+					}
+					break;
+
 
 				case IDCANCEL:
 					SendMessage(hDlg, WM_CLOSE, 0, 0);
@@ -297,6 +321,18 @@ static BOOL CALLBACK game_option_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM
 					add_name_list(gi->player_name[1]);
 					add_name_list(gi->player_name[0]);
 
+				// COM
+					if(IsDlgButtonChecked(hDlg, IDC_CHECK_COM1) == BST_CHECKED) {
+						gi->com[0] = TRUE;
+						gi->level[0] = SendDlgItemMessage(hDlg, IDC_COMBO_COM1, CB_GETCURSEL, 0, 0);
+					}
+
+					if(IsDlgButtonChecked(hDlg, IDC_CHECK_COM2) == BST_CHECKED) {
+						gi->com[1] = TRUE;
+						gi->level[1] = SendDlgItemMessage(hDlg, IDC_COMBO_COM2, CB_GETCURSEL, 0, 0);
+					}
+
+				// Score
 					gi->player_start_score[0] = gi->start_score;
 					gi->player_start_score[1] = gi->start_score;
 

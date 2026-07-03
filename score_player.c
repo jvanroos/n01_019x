@@ -204,8 +204,8 @@ static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf) {
 		return FALSE;
 	}
 
-	SetTextColor(bf->draw_dc, RGB(0, 0, 0));	// TO DO
-	SetBkColor(bf->draw_dc, RGB(100, 150, 200)); // TO DO 
+	SetTextColor(bf->draw_dc, RGB(0, 0, 0));			// TO DO
+	SetBkColor(bf->draw_dc, RGB(100, 150, 200)); 		// TO DO 
 	ret_font = SelectObject(bf->draw_dc, bf->info_font);
 
 	if (op.opi.first != 0 && bf->show_all == FALSE) {
@@ -294,8 +294,8 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			bf->draw_dc = CreateCompatibleDC(hdc);
 			bf->name_dc = CreateCompatibleDC(hdc);
 			ReleaseDC(hWnd, hdc);
-			bf->back_brush = CreateSolidBrush(RGB(0,0,0)); // TO DO: change to op.ci.player_background
-			bf->name_back_brush = CreateSolidBrush(RGB(64,128,255)); // TO DO: op.ci.player_name_background
+			bf->back_brush = CreateSolidBrush(RGB(0,0,0)); 				// TO DO: change to op.ci.player_background
+			bf->name_back_brush = CreateSolidBrush(RGB(64,128,255)); 	// TO DO: op.ci.player_name_background
 			
 			draw_init(hWnd, bf);
 			draw_player(hWnd, bf);
@@ -347,7 +347,7 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			if (ps.rcPaint.top < bf->name_height) {
 				BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, bf->name_height,
 					bf->name_dc, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
-				ps.rcPaint.top, bf->name_height;
+				ps.rcPaint.top = bf->name_height;
 			}
 			BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom,
 				bf->draw_dc, ps.rcPaint.left, ps.rcPaint.top + bf->top - bf->name_height, SRCCOPY);
