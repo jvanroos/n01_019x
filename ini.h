@@ -11,5 +11,5 @@
 /* Function Prototypes */
 BOOL ini_get_option(const TCHAR *ini_path);
 BOOL ini_put_option(const TCHAR *ini_path);
-
+BOOL ini_put_game_option(const TCHAR *ini_path);
 #endif

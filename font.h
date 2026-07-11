@@ -16,7 +16,7 @@
 
 /* Function Prototypes */
 HFONT font_create(const TCHAR *FontName, const int FontSize, const int weight, const BOOL under_line, const BOOL fixed);
-//HFONT font_create_menu(const int FontSize, const int weight, const BOOL under_line);
+HFONT font_create_menu(const int FontSize, const int weight, const BOOL under_line);
 
 #endif
 /* End of source */

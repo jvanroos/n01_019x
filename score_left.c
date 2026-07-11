@@ -176,7 +176,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			SetBkMode(bf->draw_dc, TRANSPARENT);
 			bf->back_brush = CreateSolidBrush(RGB(255, 255, 255));	// TODO: Nog te vervangen.
 			bf->active_border_brush = CreateSolidBrush(RGB(0, 0, 255)); // TODO: Nog te vervangen.
-			bf->pi->left = 501;	// TODO: Moet uit de GAME_INFO komen.
+//			bf->pi->left = 501;	// TODO: Moet uit de GAME_INFO komen.
 			draw_score(hWnd, bf);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
@@ -214,7 +214,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			return ret;
 		
 		case WM_LEFT_REDRAW:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
@@ -224,7 +224,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			break;
 
 		case WM_LEFT_DRAW_INIT:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
@@ -238,11 +238,11 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			break;
 
 		case WM_LEFT_SET_CURRENT:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
-			// wParam contains TTUE or FALSE according to the wParam from SendMessage()
+			// wParam contains TRUE or FALSE according to the wParam from SendMessage()
 			bf->current = wParam;	
 
 			if (bf->current == TRUE) {
