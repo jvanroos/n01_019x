@@ -239,7 +239,7 @@ static LRESULT CALLBACK score_guide_proc(const HWND hWnd, const UINT msg, WPARAM
 			break;
 
 		case WM_PAINT:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}

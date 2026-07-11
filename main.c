@@ -106,7 +106,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			left = 0;
 			right = rect.right;
 			left_height = 0;
-			guide_height = 10;
+			guide_height = 0;
 			
 			if(op.view_guide == 1) {
 				guide_height = SendMessage(wi.score_guide_wnd, WM_GUIDE_GET_HEIGHT, rect.right, 0);
@@ -133,6 +133,14 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 					i / 100, rect.bottom - left_height - guide_height, TRUE);
 				left = i / 100 + 4;
 				right = i * 3 / 100 - 8;
+			}
+			MoveWindow(wi.score_list_wnd, left, 0, right, rect.bottom - left_height - guide_height, TRUE);
+			
+			if(op.view_guide == 1) {
+				guide_height -= 2;
+				MoveWindow(wi.score_guide_wnd, 0, rect.bottom - guide_height, rect.right, guide_height, TRUE);
+				InvalidateRect(wi.score_guide_wnd, NULL, FALSE);
+				UpdateWindow(wi.score_guide_wnd);
 			}
 			break;
 

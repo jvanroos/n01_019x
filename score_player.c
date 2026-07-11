@@ -92,9 +92,23 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 	int small_font_size;
 	int large_font_size;
 	int char_count;
+	TCHAR buf[128];
 
 	// Get Client rectangle 
 	GetClientRect(hWnd, &rect);
+
+
+	wsprintf(
+	    buf,
+	    TEXT("draw_init: left=%d top=%d right=%d bottom=%d\r\n"),
+	    rect.left,
+	    rect.top,
+	    rect.right,
+	    rect.bottom
+	);
+
+	OutputDebugString(buf);
+
 	hdc = GetDC(hWnd);
 
 	if (bf->history == TRUE) {
