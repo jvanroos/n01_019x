@@ -5,9 +5,11 @@
 /* Define */
 #define BUF_SIZE					256
 #define NAME_SIZE					64
+
 #define APP_NAME					TEXT("n01 Ver 0.1.9")
 #define APP_VERSION					18
 
+#define ID_ACCEL_INPUT_SCORE		51000
 
 #define MAX_ROUND					60
 #define ALLOC_ROUND					10
@@ -39,6 +41,12 @@ typedef struct _GAME_INFO {
 	BOOL 	schedule_flag;
 	BOOL 	change_first;
 } GAME_INFO;
+
+typedef struct _KEY_INFO {
+	int action;
+	int ctrl;
+	int key;
+} KEY_INFO;
 
 typedef struct _OP_PLAYER_INFO {
 	int 	name;
@@ -117,7 +125,7 @@ typedef struct _OPTION_INFO {
 	TCHAR font_name[BUF_SIZE];
 
 	// Option key
-//	KEY_INFO *key_info;
+	KEY_INFO *key_info;
 	int key_info_count;
 	BOOL key_save;
 

@@ -28,12 +28,12 @@ typedef struct _KEY {
 	UINT hash;
 	TCHAR *string;
 	BOOL comment_flag;
-} KEY_INFO;
+} KEY_INFOS;
 
 typedef struct _SECTION {
 	TCHAR section_name[BUF_SIZE];
 	UINT hash;
-	KEY_INFO *key_info;
+	KEY_INFOS *key_info;
 	int key_count;
 	int key_size;	
 } SECTION_INFO;
@@ -237,7 +237,7 @@ static BOOL section_add(const TCHAR *section_name)
  */
 static BOOL key_add(SECTION_INFO *si, const TCHAR *key_name, const TCHAR *str, const BOOL comment_flag)
 {
-	KEY_INFO *tmp_key;
+	KEY_INFOS *tmp_key;
 
 	if (key_name == NULL || *key_name == TEXT('\0') || str == NULL) {
 		return FALSE;
@@ -246,11 +246,11 @@ static BOOL key_add(SECTION_INFO *si, const TCHAR *key_name, const TCHAR *str, c
 	if (si->key_size < si->key_count + 1) {
 
 		si->key_size += ALLOC_SIZE;
-		if ((tmp_key = (KEY_INFO *)mem_calloc(sizeof(KEY_INFO) * si->key_size)) == NULL) {
+		if ((tmp_key = (KEY_INFOS *)mem_calloc(sizeof(KEY_INFOS) * si->key_size)) == NULL) {
 			return FALSE;
 		}
 		if (si->key_info != NULL) {
-			CopyMemory(tmp_key, si->key_info, sizeof(KEY_INFO) * si->key_count);
+			CopyMemory(tmp_key, si->key_info, sizeof(KEY_INFOS) * si->key_count);
 			mem_free((void *)&si->key_info);
 		}
 		si->key_info = tmp_key;

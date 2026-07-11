@@ -101,11 +101,187 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	profile_get_string(TEXT("font"), TEXT("name"), message_get_res(IDS_STRING_DEFAULT_FONT), op.font_name, BUF_SIZE - 1, ini_path);
 	op.left_font_size = profile_get_int(TEXT("font"), TEXT("left_font_size"), 40, ini_path);
 
+	// Key Information
+	op.key_info_count = profile_get_int(TEXT("key"), TEXT("count"), -1, ini_path);
+	if (op.key_info_count == -1) {
+		op.key_save = FALSE;
+		op.key_info = (KEY_INFO *)mem_alloc(sizeof(KEY_INFO) * 30);
+		if (op.key_info == NULL) {
+			return FALSE;
+		}
+	
+		op.key_info_count = 0;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F1;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 26;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F2;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 41;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F3;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 45;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F4;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 60;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F5;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 81;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F6;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 85;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F7;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 100;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F8;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 43;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F1;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 55;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F2;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 83;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F3;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 95;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F4;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 121;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F5;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 125;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F6;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 140;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F7;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_ACCEL_INPUT_SCORE + 180;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F8;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_FINISH_ONE;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = '1';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_FINISH_TWO;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = '2';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_FINISH_THREE;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = '3';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_MIDDLE;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = 'M';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_SCORE_LEFT;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = 'T';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_NEW_GAME;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = 'N';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_GAME_HISTORY;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = 'H';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_ARRANGE;
+		op.key_info[op.key_info_count].ctrl = FCONTROL;
+		op.key_info[op.key_info_count].key = 'A';
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_SCORE_LEFT;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F9;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_MIDDLE;
+		op.key_info[op.key_info_count].ctrl = FSHIFT;
+		op.key_info[op.key_info_count].key = VK_F9;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_FINISH_ONE;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F10;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_FINISH_TWO;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F11;
+		op.key_info_count++;
+
+		op.key_info[op.key_info_count].action = ID_MENUITEM_FINISH_THREE;
+		op.key_info[op.key_info_count].ctrl = 0;
+		op.key_info[op.key_info_count].key = VK_F12;
+		op.key_info_count++;
+
+
+	} else {
+		op.key_save = TRUE;
+		op.key_info = (KEY_INFO*)mem_alloc(sizeof(KEY_INFO) * op.key_info_count);
+		if(op.key_info == NULL) {
+			return FALSE;
+		}
+		for (i = 0; i < op.key_info_count; i++) {
+			wsprintf(buf, TEXT("action_%d"), i);
+			op.key_info[i].action = profile_get_int(TEXT("key"), buf, 0, ini_path);
+			wsprintf(buf, TEXT("ctrl_%d"), i);
+			op.key_info[i].ctrl = profile_get_int(TEXT("key"), buf, 0, ini_path);
+			wsprintf(buf, TEXT("key_%d"), i);
+			op.key_info[i].key = profile_get_int(TEXT("key"), buf, 0, ini_path);
+		}
+	}
+
+
 	// Player game information
 	op.opi.large_font = profile_get_int(TEXT("player"), TEXT("large_font"), 0, ini_path);
 
 	op.opi.name = profile_get_int(TEXT("player"), TEXT("name"), 1, ini_path);
 	op.opi.first = profile_get_int(TEXT("player"), TEXT("first"), 1, ini_path);
+
+
 
 	profile_free();
 	return TRUE;
@@ -183,6 +359,18 @@ BOOL ini_put_option(const TCHAR *ini_path)
 	profile_write_int(TEXT("player"), TEXT("avg_keep_count"), op.opi.avg_keep_count, ini_path);
 	profile_write_int(TEXT("player"), TEXT("avg_break"), op.opi.avg_break, ini_path);
 	profile_write_int(TEXT("player"), TEXT("avg_break_count"), op.opi.avg_break_count, ini_path);
+
+	if (op.key_save == TRUE) {
+		profile_write_int(TEXT("key"), TEXT("count"), op.key_info_count, ini_path);
+		for (i = 0; i < op.key_info_count; i++) {
+			wsprintf(buf, TEXT("action_%d"), i);
+			profile_write_int(TEXT("key"), buf, op.key_info[i].action, ini_path);
+			wsprintf(buf, TEXT("ctrl_%d"), i);
+			profile_write_int(TEXT("key"), buf, op.key_info[i].ctrl, ini_path);
+			wsprintf(buf, TEXT("key_%d"), i);
+			profile_write_int(TEXT("key"), buf, op.key_info[i].key, ini_path);
+		}
+	}
 
 	profile_flush(ini_path);
 	profile_free();

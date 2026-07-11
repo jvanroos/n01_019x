@@ -19,6 +19,7 @@ IDR_MENU_MAIN MENU
   {
     MENUITEM "&Player Information", ID_MENUITEM_SHOW_PLAYER
     MENUITEM "Left Score", ID_MENUITEM_SHOW_LEFT
+    MENUITEM "Function Key", ID_MENUITEM_SHOW_GUIDE
   }
   POPUP "Help"
   {

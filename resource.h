@@ -52,8 +52,15 @@
 #define ID_MENUITEM_SHOW_PLAYER  		40014
 #define ID_MENUITEM_NEW_GAME            40016
 #define ID_MENUITEM_EXIT                40017
+#define ID_MENUITEM_FINISH_ONE          40018
+#define ID_MENUITEM_FINISH_TWO          40019
+#define ID_MENUITEM_FINISH_THREE        40020
+#define ID_MENUITEM_MIDDLE              40021
 #define ID_MENUITEM_ABOUT               40024
-
+#define ID_MENUITEM_SCORE_LEFT          40026
+#define ID_MENUITEM_SHOW_GUIDE			40031
+#define ID_MENUITEM_ARRANGE             40034
+#define ID_MENUITEM_GAME_HISTORY        40038
 
 #define IDS_STRING_EXIT  				10001
 #define IDS_STRING_DEFAULT_FONT  		10002
@@ -65,6 +72,3 @@
 #define IDS_STRING_OP_NAME              10008
 #define IDS_STRING_COM                  10009
 #define IDS_STRING_P_FIRST              10010
-
-
-

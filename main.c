@@ -11,10 +11,14 @@
 #include "game_option.h"
 #include "score_info.h"
 #include "score_player.h"
+#include "score_guide.h"
 
 /* Define */
 #define MAIN_WND_CLASS				TEXT("n01_wnd")
 #define WINDOW_TITLE				TEXT("n01")
+
+#define ID_TIMER_INIT				1
+#define TIMER_INTERVAL_INIT			1
 
 #define INI_FILE					TEXT("n01.ini")
 /* Global Variables */	
@@ -45,6 +49,7 @@ static void 			get_path(const HINSTANCE hInstance);
 static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static WINDOW_INFO wi;
+	SCORE_INFO *tmp_si = NULL;
 
 	RECT rect;
 	int left, right;
@@ -59,6 +64,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			wi.score_left_wnd[1] = score_left_create(hInst, hWnd, 0, &si.player[1]);
 			wi.score_player_wnd[0] = score_player_create(hInst, hWnd, 0, &si.player[0]);
 			wi.score_player_wnd[1] = score_player_create(hInst, hWnd, 0, &si.player[1]);
+			wi.score_guide_wnd = score_guide_create(hInst, hWnd, 0);
 
 			if (op.view_player == 1) {
 				CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_PLAYER, MF_CHECKED);
@@ -75,6 +81,14 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 				SendMessage(wi.score_left_wnd[0], WM_LEFT_DRAW_INIT, 0, 0);
 			}
 
+			if (op.view_guide == 1) {
+				CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1),ID_MENUITEM_SHOW_GUIDE, MF_CHECKED);
+				ShowWindow(wi.score_guide_wnd, SW_SHOW);
+			}
+
+			if (tmp_si == NULL) {
+				SetTimer(hWnd, ID_TIMER_INIT, TIMER_INTERVAL_INIT, NULL);
+			}
 			break;
 
 		case WM_EXITSIZEMOVE:
@@ -94,6 +108,11 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			left_height = 0;
 			guide_height = 10;
 			
+			if(op.view_guide == 1) {
+				guide_height = SendMessage(wi.score_guide_wnd, WM_GUIDE_GET_HEIGHT, rect.right, 0);
+				guide_height +=2;
+			}
+
 			if (op.view_left == 1) {
 				left_height = SendMessage(wi.score_left_wnd[0], WM_LEFT_GET_HEIGHT, rect.right/2, (LPARAM)&i);
 				SendMessage(wi.score_left_wnd[0], WM_LEFT_SET_FONT_SIZE, 0, i);
@@ -147,6 +166,13 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 					SendMessage(hWnd, WM_SIZE, 0, 0);
 					break;  
 
+				case ID_MENUITEM_SHOW_GUIDE:
+					op.view_guide = !op.view_guide;
+					ShowWindow(wi.score_guide_wnd, (op.view_guide == 1) ? SW_SHOW : SW_HIDE);
+					CheckMenuItem(GetSubMenu(GetMenu(hWnd), 1), ID_MENUITEM_SHOW_GUIDE, (op.view_guide == 1) ? MF_CHECKED : MF_UNCHECKED);
+					SendMessage(hWnd, WM_SIZE, 0, 0);
+					break;
+
 				case ID_MENUITEM_SHOW_PLAYER:
 					op.view_player = !op.view_player;
 					ShowWindow(wi.score_player_wnd[0], (op.view_player == 1) ? SW_SHOW : SW_HIDE);
@@ -170,6 +196,15 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 				case ID_MENUITEM_EXIT:
 					SendMessage(hWnd, WM_CLOSE, 0, 0);
+					break;
+			}
+			break;
+
+		case WM_TIMER:
+			switch(wParam) {
+				case ID_TIMER_INIT:
+					KillTimer(hWnd, ID_TIMER_INIT);
+					SendMessage(hWnd, WM_COMMAND, ID_MENUITEM_NEW_GAME,0);
 					break;
 			}
 			break;
@@ -311,11 +346,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	
 	if (score_left_regist(hInstance) == FALSE ||
-		score_player_regist(hInstance) == FALSE) {
-		message_get_error(GetLastError(), err_str);
-		MessageBox(NULL, err_str, APP_NAME, MB_ICONERROR);
-		return 0;
-	}
+		score_player_regist(hInstance) == FALSE ||
+		score_guide_regist(hInstance) == FALSE) 
+		{
+			message_get_error(GetLastError(), err_str);
+			MessageBox(NULL, err_str, APP_NAME, MB_ICONERROR);
+			return 0;
+		}
 
 	if (InitApplication(hInstance) == FALSE) {
 		return 0;
@@ -334,6 +371,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+
+	mem_free((void *)&op.key_info);
 
 #ifdef _DEBUG
 	mem_debug();
