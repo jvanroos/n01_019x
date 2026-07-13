@@ -26,9 +26,29 @@ extern HINSTANCE hInst;
 extern OPTION_INFO op;
 extern SCORE_INFO si;
 
-BOOL score_list_regist(const HINSTANCE hInstance)
+static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
+
+static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	return TRUE;
+	return 0;
+}
+
+BOOL score_list_regist(const HINSTANCE hInstance)
+{	
+	WNDCLASS wc;
+
+	wc.style = 0;
+	wc.lpfnWndProc = (WNDPROC)score_list_proc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInstance;
+	wc.hIcon = NULL;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = WINDOW_CLASS;
+
+	return RegisterClass(&wc);
 }
 
 HWND score_list_create(const HINSTANCE hInstance, const HWND pWnd, int id, SCORE_INFO *si)
