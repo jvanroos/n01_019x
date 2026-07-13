@@ -42,6 +42,34 @@ typedef struct _GAME_INFO {
 	BOOL 	change_first;
 } GAME_INFO;
 
+typedef struct _COLOR_INFO {
+	COLORREF background;
+	COLORREF odd_background;
+	COLORREF scored_text;
+	COLORREF togo_text;
+	COLORREF header_background;
+	COLORREF header_text;
+	COLORREF last3number_text;
+	COLORREF line;
+	COLORREF separate;
+	COLORREF ton_circle;
+
+	COLORREF input_background;
+	COLORREF input_text;
+	COLORREF input_select_background;
+	COLORREF input_select_text;
+
+	COLORREF left_background;
+	COLORREF left_text;
+	COLORREF left_active_border;
+
+	COLORREF player_name_background;
+	COLORREF player_name_text;
+	COLORREF player_background;
+	COLORREF player_text;
+	COLORREF player_info_title;
+} COLOR_INFO;
+
 typedef struct _KEY_INFO {
 	int action;
 	int ctrl;

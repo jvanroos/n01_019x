@@ -92,22 +92,9 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 	int small_font_size;
 	int large_font_size;
 	int char_count;
-	TCHAR buf[128];
 
 	// Get Client rectangle 
 	GetClientRect(hWnd, &rect);
-
-
-	wsprintf(
-	    buf,
-	    TEXT("draw_init: left=%d top=%d right=%d bottom=%d\r\n"),
-	    rect.left,
-	    rect.top,
-	    rect.right,
-	    rect.bottom
-	);
-
-	OutputDebugString(buf);
 
 	hdc = GetDC(hWnd);
 
@@ -134,7 +121,24 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 		bf->name_font = NULL;
 		bf->name_height = 0;
 	}
+
+	bf->height_margin = -1;
+	font_size = (rect.right / char_count < CHAR_MIN_SIZE) ? CHAR_MIN_SIZE : rect.right / char_count;
+	small_font_size = (font_size / 5 * 4 < SMALL_MIN_SIZE) ? SMALL_MIN_SIZE : font_size / 5 * 4;
+	large_font_size = (rect.right / LARGE_COUNT < LARGE_MIN_SIZE) ? LARGE_MIN_SIZE : rect.right / LARGE_COUNT;
 	
+	bf->bmp_height = get_draw_height(hWnd, bf, TRUE);
+	if(bf->bmp_height < rect.bottom) {
+		bf->bmp_height = rect.bottom;
+	}
+	bf->draw_bmp = CreateCompatibleBitmap(hdc, rect.right, bf->bmp_height);
+	bf->draw_ret_bmp = SelectObject(bf->draw_dc, bf->draw_bmp);
+
+	ReleaseDC(hWnd, hdc);
+	bf->top = 0;
+	bf->top_button = FALSE;
+	bf->bottom_button = FALSE;
+
 	return TRUE;
 }
 
