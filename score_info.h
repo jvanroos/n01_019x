@@ -18,7 +18,7 @@
 /* Struct */
 
 /* Function Prototypes */
-//BOOL score_info_free(SCORE_INFO *si);
+BOOL score_info_free(SCORE_INFO *si);
 BOOL score_info_init(const HWND hWnd, SCORE_INFO *si, GAME_INFO *gi, const BOOL p_init);
 //BOOL score_info_copy(SCORE_INFO *to_si, const SCORE_INFO *from_si);
 //BOOL score_history_set(const HWND hWnd, SCORE_HISTORY *sh, SCORE_INFO *si);
