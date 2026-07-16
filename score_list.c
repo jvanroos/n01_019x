@@ -10,6 +10,8 @@
 #include <windows.h>
 #undef	_INC_OLE
 
+#include <uiribbon.h>
+
 #include "general.h"
 #include "Memory.h"
 #include "String.h"
@@ -20,6 +22,8 @@
 
 /* Define */
 #define WINDOW_CLASS				TEXT("score_list_wnd")
+
+#define CHAR_COUNT 					17
 
 /* Global Variables */
 extern HINSTANCE hInst;
@@ -115,6 +119,19 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 	GetClientRect(hWnd, &rect);
 	hdc = GetDC(hWnd);
 
+	bf->score_font = font_create(op.font_name, rect.right / CHAR_COUNT / ((bf->half == TRUE) ? 2 : 1), 0, FALSE, FALSE);
+	ret_font = SelectObject(hdc, bf->score_font);
+	GetTextMetrics(hdc, &tm);
+	SelectObject(hdc, ret_font);
+	bf->score_height = tm.tmHeight + tm.tmHeight / 6;
+	bf->draw_bmp = CreateCompatibleBitmap(hdc, rect.right, bf->score_height);
+	bf->draw_ret_bmp = SelectObject(bf->draw_dc, bf->draw_bmp);
+	bf->draw_ret_font = SelectObject(bf->draw_dc, bf->score_font);
+
+	bf->header_font = font_create(op.font_name, rect.right / CHAR_COUNT / 2, 0, FALSE, FALSE);
+	ret_font = SelectObject(hdc, bf->header_font);
+	GetTextMetrics(hdc, &tm);
+	SelectObject(hdc, ret_font);
 
 	ReleaseDC(hWnd, hdc);
 	return TRUE;
