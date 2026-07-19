@@ -386,6 +386,14 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			break;
 
 		case WM_PLAYER_SET_MODE:
+			bf = (DRAW_BUFFER *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if (bf == NULL) {
+				break;
+			}
+			bf->set_mode = wParam;
+			draw_free(hWnd, bf);
+			draw_init(hWnd, bf);
+			SendMessage(hWnd, WM_PLAYER_REDRAW, 0, 0);
 			break;
 
 		case WM_PLAYER_REDRAW:
@@ -393,7 +401,6 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			if (bf == NULL) {
 				break;
 			}
-
 			draw_player(hWnd, bf);
 			InvalidateRect(hWnd, NULL, FALSE);
 			UpdateWindow(hWnd);

@@ -32,6 +32,18 @@ static COLORREF get_color(const TCHAR *buf, const COLORREF def_color)
 	return _tcstol(buf, NULL, 0);
 }
 
+static void put_color(const TCHAR *ini_path, const TCHAR *key, const COLORREF color, const COLORREF def_color)
+{
+	TCHAR buf[BUF_SIZE];
+
+	if (def_color == color) {
+		profile_write_string(TEXT("color"), key, TEXT(""), ini_path);
+	} else {
+		wsprintf(buf, TEXT("0x%06lX"), color);
+		profile_write_string(TEXT("color"), key, buf, ini_path);
+	}
+}
+
 BOOL ini_get_option(const TCHAR *ini_path)
 {
 	RECT rect;
@@ -100,6 +112,56 @@ BOOL ini_get_option(const TCHAR *ini_path)
 
 	profile_get_string(TEXT("font"), TEXT("name"), message_get_res(IDS_STRING_DEFAULT_FONT), op.font_name, BUF_SIZE - 1, ini_path);
 	op.left_font_size = profile_get_int(TEXT("font"), TEXT("left_font_size"), 40, ini_path);
+
+	// Colors
+	profile_get_string(TEXT("color"), TEXT("background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.background = get_color(buf, D_COLOR_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("odd_background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.odd_background = get_color(buf, D_COLOR_ODD_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("scored_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.scored_text = get_color(buf, D_COLOR_TEXT);
+	profile_get_string(TEXT("color"), TEXT("text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.togo_text = get_color(buf, D_COLOR_TEXT);
+	profile_get_string(TEXT("color"), TEXT("header_background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.header_background = get_color(buf, D_COLOR_HEADER_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("header_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.header_text = get_color(buf, D_COLOR_HEADER_TEXT);
+	profile_get_string(TEXT("color"), TEXT("last3number_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.last3number_text = get_color(buf, D_COLOR_LAST3NUMBER_TEXT);
+	profile_get_string(TEXT("color"), TEXT("line"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.line = get_color(buf, D_COLOR_LINE);
+	profile_get_string(TEXT("color"), TEXT("separate"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.separate = get_color(buf, D_COLOR_SEPARATE);
+	profile_get_string(TEXT("color"), TEXT("ton_circle"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.ton_circle = get_color(buf, D_COLOR_TON_CIRCLE);
+
+	profile_get_string(TEXT("color"), TEXT("input_background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.input_background = get_color(buf, D_COLOR_INPUT_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("input_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.input_text = get_color(buf, D_COLOR_INPUT_TEXT);
+	profile_get_string(TEXT("color"), TEXT("input_select_background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.input_select_background = get_color(buf, D_COLOR_INPUT_SELECT_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("input_select_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.input_select_text = get_color(buf, D_COLOR_INPUT_SELECT_TEXT);
+
+
+	profile_get_string(TEXT("color"), TEXT("left_background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.left_background = get_color(buf, D_COLOR_LEFT_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("left_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.left_text = get_color(buf, D_COLOR_LEFT_TEXT);
+	profile_get_string(TEXT("color"), TEXT("left_active_border"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.left_active_border = get_color(buf, D_COLOR_LEFT_ACTIVE_BORDER);
+
+	profile_get_string(TEXT("color"), TEXT("player_name_background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.player_name_background = get_color(buf, D_COLOR_PLAYER_NAME_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("player_name_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.player_name_text = get_color(buf, D_COLOR_PLAYER_NAME_TEXT);
+	profile_get_string(TEXT("color"), TEXT("player_background"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.player_background = get_color(buf, D_COLOR_PLAYER_BACKGROUND);
+	profile_get_string(TEXT("color"), TEXT("player_text"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.player_text = get_color(buf, D_COLOR_PLAYER_TEXT);
+	profile_get_string(TEXT("color"), TEXT("player_info_title"), TEXT(""), buf, BUF_SIZE - 1, ini_path);
+	op.ci.player_info_title = get_color(buf, D_COLOR_PLAYER_INFO_TITLE);
 
 	// Key Information
 	op.key_info_count = profile_get_int(TEXT("key"), TEXT("count"), -1, ini_path);
@@ -287,18 +349,6 @@ BOOL ini_get_option(const TCHAR *ini_path)
 	return TRUE;
 }
 
-static void put_color(const TCHAR *ini_path, const TCHAR *key, const COLORREF color, const COLORREF def_color) 
-{
-	TCHAR buf[BUF_SIZE];
-
-	if (def_color == color) {
-		profile_write_string(TEXT("color"), key, TEXT(""), ini_path);
-	} else {
-		wsprintf(buf, TEXT("0x%061X"), color);
-		profile_write_string(TEXT("color"), key, buf, ini_path);
-	}
-}
-
 BOOL ini_put_option(const TCHAR *ini_path)
 {
 	TCHAR buf[BUF_SIZE];
@@ -331,6 +381,33 @@ BOOL ini_put_option(const TCHAR *ini_path)
 	profile_write_int(TEXT("view"), TEXT("ton_circle"), op.view_ton_circle, ini_path);
 	profile_write_int(TEXT("view"), TEXT("separate"), op.view_separate, ini_path);
 	profile_write_int(TEXT("view"), TEXT("scroll_bar"), op.view_scroll_bar, ini_path);
+
+	// Color Information
+	put_color(ini_path, TEXT("background"), op.ci.background, D_COLOR_BACKGROUND);
+	put_color(ini_path, TEXT("odd_background"), op.ci.odd_background, D_COLOR_ODD_BACKGROUND);
+	put_color(ini_path, TEXT("scored_text"), op.ci.scored_text, D_COLOR_TEXT);
+	put_color(ini_path, TEXT("text"), op.ci.togo_text, D_COLOR_TEXT);
+	put_color(ini_path, TEXT("header_background"), op.ci.header_background, D_COLOR_HEADER_BACKGROUND);
+	put_color(ini_path, TEXT("header_text"), op.ci.header_text, D_COLOR_HEADER_TEXT);
+	put_color(ini_path, TEXT("last3number_text"), op.ci.last3number_text, D_COLOR_LAST3NUMBER_TEXT);
+	put_color(ini_path, TEXT("line"), op.ci.line, D_COLOR_LINE);
+	put_color(ini_path, TEXT("separate"), op.ci.separate, D_COLOR_SEPARATE);
+	put_color(ini_path, TEXT("ton_circle"), op.ci.ton_circle, D_COLOR_TON_CIRCLE);
+
+	put_color(ini_path, TEXT("input_background"), op.ci.input_background, D_COLOR_INPUT_BACKGROUND);
+	put_color(ini_path, TEXT("input_text"), op.ci.input_text, D_COLOR_INPUT_TEXT);
+	put_color(ini_path, TEXT("input_select_background"), op.ci.input_select_background, D_COLOR_INPUT_SELECT_BACKGROUND);
+	put_color(ini_path, TEXT("input_select_text"), op.ci.input_select_text, D_COLOR_INPUT_SELECT_TEXT);
+
+	put_color(ini_path, TEXT("left_background"), op.ci.left_background, D_COLOR_LEFT_BACKGROUND);
+	put_color(ini_path, TEXT("left_text"), op.ci.left_text, D_COLOR_LEFT_TEXT);
+	put_color(ini_path, TEXT("left_active_border"), op.ci.left_active_border, D_COLOR_LEFT_ACTIVE_BORDER);
+
+	put_color(ini_path, TEXT("player_name_background"), op.ci.player_name_background, D_COLOR_PLAYER_NAME_BACKGROUND);
+	put_color(ini_path, TEXT("player_name_text"), op.ci.player_name_text, D_COLOR_PLAYER_NAME_TEXT);
+	put_color(ini_path, TEXT("player_background"), op.ci.player_background, D_COLOR_PLAYER_BACKGROUND);
+	put_color(ini_path, TEXT("player_text"), op.ci.player_text, D_COLOR_PLAYER_TEXT);
+	put_color(ini_path, TEXT("player_info_title"), op.ci.player_info_title, D_COLOR_PLAYER_INFO_TITLE);
 
 	// Player Information
 	profile_write_int(TEXT("player"), TEXT("large_font"), op.opi.large_font, ini_path);

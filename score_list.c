@@ -17,6 +17,7 @@
 #include "String.h"
 #include "Message.h"
 #include "font.h"
+#include "score_list.h"
 #include "score_info.h"
 #include "resource.h"
 
@@ -106,6 +107,7 @@ typedef struct _DRAW_BUFFER {
 // Prototypes
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf);
 static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf);
+static BOOL draw_background(const DRAW_BUFFER *bf, const int first);
 static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
 
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
@@ -119,6 +121,7 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 	GetClientRect(hWnd, &rect);
 	hdc = GetDC(hWnd);
 
+	// Score Font
 	bf->score_font = font_create(op.font_name, rect.right / CHAR_COUNT / ((bf->half == TRUE) ? 2 : 1), 0, FALSE, FALSE);
 	ret_font = SelectObject(hdc, bf->score_font);
 	GetTextMetrics(hdc, &tm);
@@ -128,10 +131,31 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 	bf->draw_ret_bmp = SelectObject(bf->draw_dc, bf->draw_bmp);
 	bf->draw_ret_font = SelectObject(bf->draw_dc, bf->score_font);
 
+	// Header Font
 	bf->header_font = font_create(op.font_name, rect.right / CHAR_COUNT / 2, 0, FALSE, FALSE);
 	ret_font = SelectObject(hdc, bf->header_font);
 	GetTextMetrics(hdc, &tm);
 	SelectObject(hdc, ret_font);
+	bf->header_height = tm.tmHeight + tm.tmHeight / 6;
+	bf->back_width = rect.right;
+	bf->back_height = bf->header_height + bf->score_height * 2;
+	bf->back_redraw = TRUE;
+	bf->back_bmp = CreateCompatibleBitmap(hdc, rect.right, bf->back_height);
+	bf->back_ret_bmp = SelectObject(bf->back_dc, bf->back_bmp);
+	bf->back_ret_font = SelectObject(bf->back_dc, bf->header_font);
+	
+	// Input fields
+	i = (rect.right * 100) / CHAR_COUNT;
+	bf->input_left[0] = 0;
+	bf->score_left[0] = i * 3 / 100;
+	bf->score_right[0] = i * 7 / 100;
+	bf->input_left[1] = i * 10 / 100;
+	bf->score_left[1] = i * 13 / 100;
+	bf->score_right[1] = rect.right;
+
+	// Score Ellipse
+	bf->ellipse_bmp = CreateCompatibleBitmap(hdc, (bf->score_left[1] - bf->input_left[1]) * 2, bf->score_height * 2);
+	bf->ellipse_ret_bmp = SelectObject(bf->ellipse_dc, bf->ellipse_bmp);
 
 	ReleaseDC(hWnd, hdc);
 	return TRUE;
@@ -181,10 +205,26 @@ static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf)
 	return TRUE;
 }
 
+static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
+{	
+	RECT draw_rect;
+	HPEN ret_pen;
+	RECT rect;
+	TCHAR buf[BUF_SIZE];	
+	int height;
+	int j;
+
+	SetRect(&rect, 0, 0, bf->back_width, bf->back_height);
+	FillRect(bf->back_dc, &rect, bf->back_brush);
+
+	return TRUE;
+}
+
 static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	DRAW_BUFFER *bf;
 	HDC hdc;
+	PAINTSTRUCT ps;
 
 	TCHAR buf[BUF_SIZE];
 	switch(msg) {
@@ -268,6 +308,22 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 				mem_free((void *)&bf);
 			}
 			return DefWindowProc(hWnd, msg, wParam, lParam);
+		
+		case WM_PAINT:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if(bf == NULL){
+				break;
+			}
+			hdc = BeginPaint(hWnd, &ps);
+/*
+			if (bf->back_redraw == TRUE || bf->back_first != bf->si->leg[bf->view_leg].first) {
+				bf->back_redraw = FALSE;
+				bf->back_first = bf->si->leg[bf->view_leg].first;
+				draw_background(bf, bf->back_first);
+			}
+*/
+			EndPaint(hWnd, &ps);
+			break;
 
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);

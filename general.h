@@ -9,18 +9,42 @@
 #define APP_NAME					TEXT("n01 Ver 0.1.9")
 #define APP_VERSION					18
 
-#define ID_ACCEL_INPUT_SCORE		51000
-
-#define MAX_ROUND					60
-#define ALLOC_ROUND					10
-#define NAME_LIST_COUNT				64
-
 #define WM_WINDOW_REDRAW			(WM_APP + 1)
 #define WM_WINDOW_SET_FIRST			(WM_APP + 3)
 #define WM_WINDOW_SET_CURRENT		(WM_APP + 8)
 #define WM_N01_GAME_ON				(WM_APP + 531)
 
-typedef char TYPE_CHECK_OUT;
+#define MAX_ROUND					60
+#define ALLOC_ROUND					10
+#define NAME_LIST_COUNT				64
+
+#define ID_ACCEL_INPUT_SCORE		51000
+
+// Colors
+#define D_COLOR_BACKGROUND				GetSysColor(COLOR_WINDOW)
+#define D_COLOR_ODD_BACKGROUND			GetSysColor(COLOR_WINDOW)
+#define D_COLOR_TEXT					GetSysColor(COLOR_WINDOWTEXT)
+#define D_COLOR_HEADER_BACKGROUND		GetSysColor(COLOR_3DFACE)
+#define D_COLOR_HEADER_TEXT				GetSysColor(COLOR_BTNTEXT)
+#define D_COLOR_LAST3NUMBER_TEXT		RGB(128, 0, 0)
+#define D_COLOR_LINE					GetSysColor(COLOR_3DSHADOW)
+#define D_COLOR_SEPARATE				GetSysColor(COLOR_BTNTEXT)
+#define D_COLOR_TON_CIRCLE				GetSysColor(COLOR_3DSHADOW)
+
+#define D_COLOR_INPUT_BACKGROUND		RGB(255, 255, 128)
+#define D_COLOR_INPUT_TEXT				RGB(0, 0, 0)
+#define D_COLOR_INPUT_SELECT_BACKGROUND	GetSysColor(COLOR_HIGHLIGHT)
+#define D_COLOR_INPUT_SELECT_TEXT		GetSysColor(COLOR_HIGHLIGHTTEXT)
+
+#define D_COLOR_LEFT_BACKGROUND			GetSysColor(COLOR_WINDOW)
+#define D_COLOR_LEFT_TEXT				GetSysColor(COLOR_WINDOWTEXT)
+#define D_COLOR_LEFT_ACTIVE_BORDER		GetSysColor(COLOR_HIGHLIGHT)
+
+#define D_COLOR_PLAYER_NAME_BACKGROUND	GetSysColor(COLOR_ACTIVECAPTION)
+#define D_COLOR_PLAYER_NAME_TEXT		GetSysColor(COLOR_CAPTIONTEXT)
+#define D_COLOR_PLAYER_BACKGROUND		GetSysColor(COLOR_3DFACE)
+#define D_COLOR_PLAYER_TEXT				GetSysColor(COLOR_BTNTEXT)
+#define D_COLOR_PLAYER_INFO_TITLE		GetSysColor(COLOR_HIGHLIGHT)
 
 // typedef
 typedef short TYPE_SCORE;
@@ -149,7 +173,7 @@ typedef struct _OPTION_INFO {
 	int com_arrange_info_count;
 
 	// Option view
-//	COLOR_INFO ci;
+	COLOR_INFO ci;
 	TCHAR font_name[BUF_SIZE];
 
 	// Option key

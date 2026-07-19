@@ -9,6 +9,7 @@
 #include "score_left.h"
 #include "resource.h"
 #include "game_option.h"
+#include "score_list.h"
 #include "score_info.h"
 #include "score_player.h"
 #include "score_guide.h"
@@ -60,6 +61,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 		case WM_CREATE:
 
 			wi.hWnd = hWnd;
+			wi.score_list_wnd = score_list_create(hInst, hWnd, 0, &si);
 			wi.score_left_wnd[0] = score_left_create(hInst, hWnd, 0, &si.player[0]);
 			wi.score_left_wnd[1] = score_left_create(hInst, hWnd, 0, &si.player[1]);
 			wi.score_player_wnd[0] = score_player_create(hInst, hWnd, 0, &si.player[0]);
@@ -353,7 +355,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 	
-	if (score_left_regist(hInstance) == FALSE ||
+	if (score_list_regist(hInstance) == FALSE ||
+		score_left_regist(hInstance) == FALSE ||
 		score_player_regist(hInstance) == FALSE ||
 		score_guide_regist(hInstance) == FALSE) 
 		{
