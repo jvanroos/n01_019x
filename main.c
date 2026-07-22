@@ -60,6 +60,10 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 	switch (msg) {
 		case WM_CREATE:
 
+			if (tmp_si == NULL && score_info_init(hWnd, &si, &op.gi, TRUE) == FALSE) {
+				return -1;
+			}
+
 			wi.hWnd = hWnd;
 			wi.score_list_wnd = score_list_create(hInst, hWnd, 0, &si);
 			wi.score_left_wnd[0] = score_left_create(hInst, hWnd, 0, &si.player[0]);
@@ -89,6 +93,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			}
 
 			if (tmp_si == NULL) {
+				SendMessage(wi.score_list_wnd, WM_SCORE_INIT_LEG, TRUE, TRUE);
 				SetTimer(hWnd, ID_TIMER_INIT, TIMER_INTERVAL_INIT, NULL);
 			}
 			break;
@@ -155,6 +160,9 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 
 		case WM_DESTROY:
 			ini_put_option(ini_path);
+
+			score_info_free(&si);
+
 			PostQuitMessage(0);
 			break;
 

@@ -153,8 +153,10 @@ BOOL score_info_init(const HWND hWnd, SCORE_INFO *si, GAME_INFO *gi, const BOOL 
 	GetLocalTime(&si->start_time);
 
 	score_info_free(si);
-/*
+
+/* Hier zit nog een memory leak van 148 bytes in (LEG_INFO = 148 bytes), wordt blijkbaar niet vrijgegeven?? */
 	si->leg = (LEG_INFO *)mem_calloc(sizeof(LEG_INFO));
+
 	if (si->leg == NULL) {
 		message_get_error(GetLastError(), err_str);
 		MessageBox(hWnd, err_str, APP_NAME, MB_ICONERROR);
@@ -194,6 +196,6 @@ BOOL score_info_init(const HWND hWnd, SCORE_INFO *si, GAME_INFO *gi, const BOOL 
 		MessageBox(hWnd, err_str, APP_NAME, MB_ICONERROR);
 		return FALSE;
 	}
-*/
+
 	return TRUE;
 }

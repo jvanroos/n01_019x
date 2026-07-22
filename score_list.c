@@ -9,6 +9,7 @@
 #define _INC_OLE
 #include <windows.h>
 #undef	_INC_OLE
+#include <tchar.h>
 
 #include <uiribbon.h>
 
@@ -107,7 +108,9 @@ typedef struct _DRAW_BUFFER {
 // Prototypes
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf);
 static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf);
+static void draw_text(const HDC hdc, const TCHAR *str, const int len, const RECT *rect);
 static BOOL draw_background(const DRAW_BUFFER *bf, const int first);
+static BOOL draw_line(DRAW_BUFFER *bf, const SCORE_INFO *si, const RECT *rect, const int round, int *left);
 static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
 
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
@@ -205,6 +208,15 @@ static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf)
 	return TRUE;
 }
 
+static void draw_text(const HDC hdc, const TCHAR *str, const int len, const RECT *rect) {
+	SIZE sz;
+	int left, top;
+	GetTextExtentPoint32(hdc, str, len, &sz);
+	left = rect->left + (rect->right - rect->left - sz.cx) / 2;
+	top = rect->top + (rect->bottom - rect->top - sz.cy) / 2;
+	ExtTextOut(hdc, left, top, ETO_CLIPPED, rect, str, len, NULL);
+}
+
 static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
 {	
 	RECT draw_rect;
@@ -220,11 +232,51 @@ static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
 	return TRUE;
 }
 
+static BOOL draw_line(DRAW_BUFFER *bf, const SCORE_INFO *si, const RECT *rect, const int round, int *left_score)
+{
+	RECT draw_rect;
+	HPEN ret_pen;
+	HBRUSH ret_brush;
+	HBRUSH ret_ellipse_brush;
+	TCHAR buf[BUF_SIZE];
+	int i,j;
+
+	BitBlt(bf->draw_dc, rect->left, 0, rect->right, bf->score_height, bf->back_dc, rect->left,
+		(round / 2 == (round + 1) / 2) ? bf->header_height : (bf->header_height + bf->score_height),
+		SRCCOPY);
+
+	if (op.view_separate == 1) {
+		ret_pen = SelectObject(bf->draw_dc, bf->separate_pen);
+		if (round % 5 == 0) {
+			MoveToEx(bf->draw_dc, rect->left, bf->score_height - 1, NULL);
+			LineTo(bf->draw_dc, rect->right, bf->score_height - 1);
+		}
+		SelectObject(bf->draw_dc, ret_pen);
+	}
+
+	// To Go
+	if (round == 0) {
+		SetTextColor(bf->draw_dc, op.ci.togo_text);
+		SetBkColor(bf->draw_dc, op.ci.background);
+		for (j = 0; j < 2; j++) {
+			SetRect(&draw_rect, bf->input_left[j], 0, bf->score_left[j], bf->score_height - 1);
+			FillRect(bf->draw_dc, &draw_rect, bf->header_back_brush);
+
+			_itot(si->player[j].start_score, buf, 10);
+			SetRect(&draw_rect, bf->score_left[j] + 1, 0, bf->score_right[j], bf->score_height);
+			draw_text(bf->draw_dc, buf, lstrlen(buf), &draw_rect);
+		}
+		return TRUE;
+	}
+	return TRUE;
+}
+
 static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	DRAW_BUFFER *bf;
 	HDC hdc;
 	PAINTSTRUCT ps;
+	int i, j;
 
 	TCHAR buf[BUF_SIZE];
 	switch(msg) {
@@ -256,14 +308,14 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 			}
 			draw_init(hWnd, bf);
 			SetBkMode(bf->draw_dc, TRANSPARENT);
-			bf->back_brush = CreateSolidBrush(RGB(255, 255, 255)); // TODO: op.ci.background
-			bf->odd_back_brush = CreateSolidBrush(RGB(255, 255, 200)); // TODO: op.ci.odd_background
-			bf->header_back_brush = CreateSolidBrush(RGB(255, 255, 100)); // TODO: op.ci.header_background
-			bf->line_pen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255)); // TODO: op.ci.line
-			bf->separate_pen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0)); // TODO: op.ci.separate
-			bf->separate_bold_pen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0)); // TODO: op.ci.separate
-			bf->finish_pen = CreatePen(PS_SOLID, bf->pen_size, RGB(0, 255, 0)); // TODO: op.ci.scored_text;
-			bf->ton_circle_pen = CreatePen(PS_SOLID, bf->pen_size, RGB(125, 125, 125)); // TODO: op.ci.ton_circle
+			bf->back_brush = CreateSolidBrush(op.ci.background); // RGB(255, 255, 255)); // TODO: op.ci.background
+			bf->odd_back_brush = CreateSolidBrush(op.ci.odd_background); // RGB(255, 255, 200)); // TODO: op.ci.odd_background
+			bf->header_back_brush = CreateSolidBrush(op.ci.header_background); // RGB(255, 255, 100)); // TODO: op.ci.header_background
+			bf->line_pen = CreatePen(PS_SOLID, 1, op.ci.line); // TODO: op.ci.line
+			bf->separate_pen = CreatePen(PS_SOLID, 1, op.ci.separate); // TODO: op.ci.separate
+			bf->separate_bold_pen = CreatePen(PS_SOLID, 2, op.ci.separate); // TODO: op.ci.separate
+			bf->finish_pen = CreatePen(PS_SOLID, bf->pen_size, op.ci.scored_text); // TODO: op.ci.scored_text;
+			bf->ton_circle_pen = CreatePen(PS_SOLID, bf->pen_size, op.ci.ton_circle); // TODO: op.ci.ton_circle
 
 			ImmAssociateContext(hWnd, (HIMC)NULL);
 
@@ -315,14 +367,51 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 				break;
 			}
 			hdc = BeginPaint(hWnd, &ps);
-/*
-			if (bf->back_redraw == TRUE || bf->back_first != bf->si->leg[bf->view_leg].first) {
+
+			if (bf->back_redraw == TRUE) { // || bf->back_first != bf->si->leg[bf->view_leg].first) {
 				bf->back_redraw = FALSE;
-				bf->back_first = bf->si->leg[bf->view_leg].first;
-				draw_background(bf, bf->back_first);
+				bf->back_first = 0; // bf->si->leg[bf->view_leg].first;
+//				draw_background(bf, bf->back_first);
 			}
-*/
+
 			EndPaint(hWnd, &ps);
+			break;
+
+		case WM_SCORE_INIT_LEG:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if(bf == NULL){
+				break;
+			}
+
+			bf->view_leg = bf->si->current_leg;
+
+			if (lParam == TRUE) {
+				score_info_free(&bf->prev_info.si);
+				score_info_free(&bf->next_info.si);
+				bf->prev_info.prev_flag = FALSE;
+				bf->next_info.prev_flag = FALSE;
+//				SendMessage(GetParent(hWnd), WM_WINDOW_SET_PREV_MENU, FALSE, 0);
+			}
+			
+			if (bf->next_info.prev_flag == FALSE || wParam == TRUE) {
+				LEG_INFO leg;
+				// leg[bf->view_leg]; -> niet geinitialiseerd?
+				leg = bf->si->leg[bf->view_leg];
+				ZeroMemory(&bf->si->leg[bf->view_leg], sizeof(LEG_INFO));
+				bf->si->leg[bf->view_leg].current_player = leg.first;
+				bf->si->leg[bf->view_leg].current_round = 0;
+				bf->si->leg[bf->view_leg].alloc_round = (bf->si->round_limit == 0) ? ALLOC_ROUND : bf->si->round;	
+				bf->si->leg[bf->view_leg].max_round = (bf->si->round_limit == 0) ? 1 : bf->si->round;		
+				bf->si->leg[bf->view_leg].first = leg.first;
+				for (i = 0; i < 2; i++) {
+					bf->si->leg[bf->view_leg].score[i] = leg.score[i];
+					bf->si->leg[bf->view_leg].score[i][0] = 0;
+					bf->si->leg[bf->view_leg].all_score[i] = bf->si->player[i].start_score;
+					bf->si->player[i].left = bf->si->player[i].start_score;
+				}
+				bf->input_x = leg.first;
+				bf->input_y = -1;
+			}
 			break;
 
 		default:

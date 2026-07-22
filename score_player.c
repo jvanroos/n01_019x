@@ -148,8 +148,7 @@ static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf)
 	HFONT 	ret_font;
 	TCHAR 	buf[BUF_SIZE];
 
-	if (bf->pi == NULL) 
-	{
+	if (bf->pi == NULL) {
 		return FALSE;
 	}
 
@@ -159,8 +158,8 @@ static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf)
 		FillRect(bf->name_dc, &draw_rect, bf->name_back_brush);
 
 		ret_font = SelectObject(bf->name_dc, bf->name_font);
-		SetTextColor(bf->name_dc, RGB(255,255,255));	// TO DO: change to op.ci.player_name_text
-		SetBkColor(bf->name_dc, RGB(64,128,255));	// TO DO: change to op.ci.player_name_background
+		SetTextColor(bf->name_dc, op.ci.player_name_text);	
+		SetBkColor(bf->name_dc, op.ci.player_name_background);	
 		if (bf->pi->com == TRUE) {
 			wsprintf(buf, message_get_res(IDS_STRING_COM), bf->pi->level + 1);
 		} else {
@@ -173,7 +172,7 @@ static BOOL draw_name(const HWND hWnd, DRAW_BUFFER *bf)
 }
 
 static int get_draw_height(const HWND hWnd, DRAW_BUFFER *bf, const BOOL arrange_flag) {
-	int height = 0;
+	int height = 500;
 	int font_height;
 
 	return height;
@@ -211,7 +210,7 @@ static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf) {
 	TCHAR buf[BUF_SIZE];
 	int left, right;
 	int title_left;
-	int height = 0;
+	int height = 100;
 	int i, j;
 
 	GetClientRect(hWnd, &rect);
@@ -222,8 +221,8 @@ static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf) {
 		return FALSE;
 	}
 
-	SetTextColor(bf->draw_dc, RGB(0, 0, 0));			// TO DO
-	SetBkColor(bf->draw_dc, RGB(100, 150, 200)); 		// TO DO 
+	SetTextColor(bf->draw_dc, op.ci.player_text);			
+	SetBkColor(bf->draw_dc, op.ci.player_background); 		
 	ret_font = SelectObject(bf->draw_dc, bf->info_font);
 
 	if (op.opi.first != 0 && bf->show_all == FALSE) {
@@ -234,7 +233,7 @@ static BOOL draw_player(const HWND hWnd, DRAW_BUFFER *bf) {
 		height += bf->font_height;
 	}
 
-
+	bf->height = height;
 	return TRUE;
 }
 
@@ -413,8 +412,8 @@ static LRESULT CALLBACK score_player_proc(const HWND hWnd, const UINT msg, WPARA
 			}
 			DeleteObject(bf->back_brush);
 			DeleteObject(bf->name_back_brush);
-			bf->back_brush = CreateSolidBrush(RGB(64, 128, 255));	// TO DO: replace with op.ci.player_background
-			bf->name_back_brush = CreateSolidBrush(RGB(255, 128, 64)); // TO DO: replace with op.ci.player_name_background
+			bf->back_brush = CreateSolidBrush(op.ci.player_background); // RGB(64, 128, 255));	// TO DO: replace with op.ci.player_background
+			bf->name_back_brush = CreateSolidBrush(op.ci.player_name_background); // RGB(255, 128, 64)); // TO DO: replace with op.ci.player_name_background
 			draw_free(hWnd, bf);
 			draw_init(hWnd, bf);
 			SendMessage(hWnd, WM_PLAYER_REDRAW, 0, 0);	
