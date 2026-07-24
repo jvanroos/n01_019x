@@ -209,8 +209,10 @@ static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf)
 }
 
 static void draw_text(const HDC hdc, const TCHAR *str, const int len, const RECT *rect) {
+
 	SIZE sz;
 	int left, top;
+
 	GetTextExtentPoint32(hdc, str, len, &sz);
 	left = rect->left + (rect->right - rect->left - sz.cx) / 2;
 	top = rect->top + (rect->bottom - rect->top - sz.cy) / 2;
@@ -228,6 +230,42 @@ static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
 
 	SetRect(&rect, 0, 0, bf->back_width, bf->back_height);
 	FillRect(bf->back_dc, &rect, bf->back_brush);
+
+	if (op.ci.background != op.ci.odd_background) {
+		height = bf->header_height + bf->score_height;
+		SetRect(&draw_rect, 0, height, bf->back_width, height + bf->score_height);
+		FillRect(bf->back_dc, &draw_rect, bf->back_brush);
+	}
+
+	SetRect(&draw_rect, 0, 0, bf->back_width, bf->header_height);
+	FillRect(bf->back_dc, &draw_rect, bf->header_back_brush);
+	SetRect(&draw_rect, bf->score_right[0], 0, bf->input_left[1], bf->back_height);
+	FillRect(bf->back_dc, &draw_rect, bf->header_back_brush);
+
+	SetTextColor(bf->back_dc, op.ci.header_text);
+	SetBkColor(bf->back_dc, op.ci.header_background);
+
+	for(j = 0; j < 2; j++) {
+		message_copy_res(IDS_STRING_SCORED, buf);
+		SetRect(&draw_rect, bf->input_left[j], 0, bf->score_left[j], bf->header_height - 1);
+		draw_text(bf->back_dc, buf, lstrlen(buf), &draw_rect);
+		if (first == j) {
+			message_copy_res(IDS_STRING_FIRST_MARK, buf);
+			lstrcat(buf, TEXT(" "));
+			message_copy_res(IDS_STRING_TO_GO, buf + lstrlen(buf));
+		} else {
+			message_copy_res(IDS_STRING_TO_GO, buf);
+		}
+		SetRect(&draw_rect, bf->input_left[j] + 1, 0, bf->score_right[j], bf->header_height - 1);
+		draw_text(bf->back_dc, buf, lstrlen(buf), &draw_rect);
+	}
+
+	ret_pen = SelectObject(bf->back_dc, bf->line_pen);
+
+	for (j = 0; j < 2; j++) {
+		MoveToEx(bf->back_dc, bf->score_left[j], 0, NULL);
+		LineTo(bf->back_dc, bf->score_left[j], bf->back_height);
+	}
 
 	return TRUE;
 }
@@ -276,9 +314,12 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 	DRAW_BUFFER *bf;
 	HDC hdc;
 	PAINTSTRUCT ps;
-	int i, j;
-
+	RECT rect;
 	TCHAR buf[BUF_SIZE];
+	int left_score[2];
+	int i, j;
+	int x, y;
+
 	switch(msg) {
 		case WM_CREATE:
 			bf = (DRAW_BUFFER*)mem_calloc(sizeof(DRAW_BUFFER));
@@ -308,14 +349,14 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 			}
 			draw_init(hWnd, bf);
 			SetBkMode(bf->draw_dc, TRANSPARENT);
-			bf->back_brush = CreateSolidBrush(op.ci.background); // RGB(255, 255, 255)); // TODO: op.ci.background
-			bf->odd_back_brush = CreateSolidBrush(op.ci.odd_background); // RGB(255, 255, 200)); // TODO: op.ci.odd_background
-			bf->header_back_brush = CreateSolidBrush(op.ci.header_background); // RGB(255, 255, 100)); // TODO: op.ci.header_background
-			bf->line_pen = CreatePen(PS_SOLID, 1, op.ci.line); // TODO: op.ci.line
-			bf->separate_pen = CreatePen(PS_SOLID, 1, op.ci.separate); // TODO: op.ci.separate
-			bf->separate_bold_pen = CreatePen(PS_SOLID, 2, op.ci.separate); // TODO: op.ci.separate
-			bf->finish_pen = CreatePen(PS_SOLID, bf->pen_size, op.ci.scored_text); // TODO: op.ci.scored_text;
-			bf->ton_circle_pen = CreatePen(PS_SOLID, bf->pen_size, op.ci.ton_circle); // TODO: op.ci.ton_circle
+			bf->back_brush = CreateSolidBrush(op.ci.background); 
+			bf->odd_back_brush = CreateSolidBrush(op.ci.odd_background); 
+			bf->header_back_brush = CreateSolidBrush(op.ci.header_background);  
+			bf->line_pen = CreatePen(PS_SOLID, 1, op.ci.line); 
+			bf->separate_pen = CreatePen(PS_SOLID, 1, op.ci.separate); 
+			bf->separate_bold_pen = CreatePen(PS_SOLID, 2, op.ci.separate); 
+			bf->finish_pen = CreatePen(PS_SOLID, bf->pen_size, op.ci.scored_text); 
+			bf->ton_circle_pen = CreatePen(PS_SOLID, bf->pen_size, op.ci.ton_circle); 
 
 			ImmAssociateContext(hWnd, (HIMC)NULL);
 
@@ -368,13 +409,69 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 			}
 			hdc = BeginPaint(hWnd, &ps);
 
-			if (bf->back_redraw == TRUE) { // || bf->back_first != bf->si->leg[bf->view_leg].first) {
+			if (bf->back_redraw == TRUE || bf->back_first != bf->si->leg[bf->view_leg].first) {
 				bf->back_redraw = FALSE;
-				bf->back_first = 0; // bf->si->leg[bf->view_leg].first;
-//				draw_background(bf, bf->back_first);
+				bf->back_first = bf->si->leg[bf->view_leg].first;
+				draw_background(bf, bf->back_first);
+			}
+
+			if (ps.rcPaint.top < bf->header_height) {
+				BitBlt(hdc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, bf->header_height,
+					bf->back_dc, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
+				ps.rcPaint.top = bf->header_height;
+			}
+
+			y = ((ps.rcPaint.top - bf->header_height) / bf->score_height) * bf->score_height + bf->header_height;
+			j = bf->pos_y + (y - bf->header_height) / bf->score_height;
+			left_score[0] = bf->si->player[0].start_score;
+			left_score[1] = bf->si->player[1].start_score;
+			for (i = 0; i < j - 1 && i < bf->si->leg[bf->view_leg].current_round; i++) {
+				left_score[0] -= bf->si->leg[bf->view_leg].score[0][i];
+				left_score[1] -= bf->si->leg[bf->view_leg].score[1][i];
+			}
+			for (i = j; y < ps.rcPaint.bottom; y += bf->score_height, i++) {
+				if (bf->si->round_limit != 0 && i > bf->si->leg[bf->view_leg].max_round) {
+					SetRect(&rect, ps.rcPaint.left, y, ps.rcPaint.right, ps.rcPaint.bottom);
+					FillRect(hdc, &rect, bf->header_back_brush);
+					break;
+				}
+				draw_line(bf, bf->si, &ps.rcPaint, i, left_score);
+				BitBlt(hdc, ps.rcPaint.left, y, ps.rcPaint.right, bf->score_height,
+					bf->draw_dc, ps.rcPaint.left, 0, SRCCOPY);
 			}
 
 			EndPaint(hWnd, &ps);
+			break;
+
+		case WM_SIZE:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if(bf == NULL){
+				break;
+			}
+			
+			draw_free(hWnd, bf);		
+			draw_init(hWnd, bf);
+			SendMessage(hWnd, WM_SCORE_REDRAW, 0, 0);	
+			
+			break;
+
+		case WM_SCORE_REDRAW:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if(bf == NULL){
+				break;
+			}
+			if(wParam == 0) {
+				InvalidateRect(hWnd, NULL, FALSE);
+			} else {
+				GetClientRect(hWnd, &rect);
+				i = bf->header_height +
+					((bf->si->leg[bf->view_leg].current_round + 1) - bf->pos_y) * bf->score_height + bf->score_height;
+				SetRect(&rect,
+					0, bf->header_height + wParam * bf->score_height,
+					rect.right, (i > rect.bottom) ? rect.bottom : i);
+				InvalidateRect(hWnd, &rect, FALSE);
+			}
+			UpdateWindow(hWnd);
 			break;
 
 		case WM_SCORE_INIT_LEG:
@@ -395,7 +492,7 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 			
 			if (bf->next_info.prev_flag == FALSE || wParam == TRUE) {
 				LEG_INFO leg;
-				// leg[bf->view_leg]; -> niet geinitialiseerd?
+
 				leg = bf->si->leg[bf->view_leg];
 				ZeroMemory(&bf->si->leg[bf->view_leg], sizeof(LEG_INFO));
 				bf->si->leg[bf->view_leg].current_player = leg.first;
@@ -412,6 +509,9 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 				bf->input_x = leg.first;
 				bf->input_y = -1;
 			}
+
+			SendMessage(hWnd, WM_SCORE_REDRAW, 0, 0);
+
 			break;
 
 		default:

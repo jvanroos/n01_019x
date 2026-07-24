@@ -233,6 +233,9 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			break;
 
 		case WM_N01_GAME_ON:
+			if(wParam == TRUE && op.gi_list_count <=0) {
+				return FALSE;
+			}
 			si.set_mode = wParam;
 			si.current_set = 0;
 			if (score_info_init(hWnd, &si, (wParam == TRUE) ? &op.gi_list[si.current_set] : &op.gi, TRUE) == FALSE) {
@@ -240,7 +243,7 @@ static LRESULT CALLBACK MainWndProc(const HWND hWnd, const UINT msg, WPARAM wPar
 			}
 			SendMessage(wi.score_player_wnd[0], WM_PLAYER_SET_MODE, (si.leg_limit == 1) ? TRUE : FALSE, 0);
 			SendMessage(wi.score_player_wnd[1], WM_PLAYER_SET_MODE, (si.leg_limit == 1) ? TRUE : FALSE, 0);
-
+			SendMessage(wi.score_list_wnd, WM_SCORE_INIT_LEG, TRUE, TRUE);
 			// TO DO: remove this line
 			SendMessage(wi.score_left_wnd[0], WM_LEFT_REDRAW, 0, 0);
 			SendMessage(wi.score_left_wnd[1], WM_LEFT_REDRAW, 1, 0);

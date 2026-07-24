@@ -72,3 +72,8 @@
 #define IDS_STRING_OP_NAME              10008
 #define IDS_STRING_COM                  10009
 #define IDS_STRING_P_FIRST              10010
+#define IDS_STRING_TO_GO				10011
+#define IDS_STRING_SCORED				10012
+#define IDS_STRING_ROUND				10013
+#define IDS_STRING_DARTS				10014
+#define IDS_STRING_FIRST_MARK			10015

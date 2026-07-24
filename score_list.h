@@ -13,5 +13,6 @@ HWND score_list_create(const HINSTANCE hInstance, const HWND pWnd, int id, SCORE
 
 /* Define */
 #define WM_SCORE_INIT_LEG			(WM_APP + 100)
+#define WM_SCORE_REDRAW				(WM_APP + 105)
 
 #endif
