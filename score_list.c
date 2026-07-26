@@ -111,7 +111,42 @@ static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf);
 static void draw_text(const HDC hdc, const TCHAR *str, const int len, const RECT *rect);
 static BOOL draw_background(const DRAW_BUFFER *bf, const int first);
 static BOOL draw_line(DRAW_BUFFER *bf, const SCORE_INFO *si, const RECT *rect, const int round, int *left);
+static void set_scrollbar(const HWND hWnd, DRAW_BUFFER *bf, const SCORE_INFO *si);
 static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
+
+static void set_scrollbar(const HWND hWnd, DRAW_BUFFER *bf, const SCORE_INFO *si) 
+{
+	SCROLLINFO sci;
+	RECT rect;
+
+	GetClientRect(hWnd, &rect);
+	bf->page_y = ((rect.bottom - bf->header_height) + 1) / bf->score_height;
+
+	if (bf->page_y < si->leg[bf->view_leg].max_round + 1) {
+		EnableScrollBar(hWnd, SB_VERT, ESB_ENABLE_BOTH);
+
+		bf->max_y = si->leg[bf->view_leg].max_round - (bf->page_y - 1);
+		bf->pos_y = (bf->pos_y < bf->max_y) ? bf->pos_y : bf->max_y;
+
+		ZeroMemory(&sci, sizeof(SCROLLINFO));
+		sci.cbSize = sizeof(SCROLLINFO);
+		sci.fMask  = SIF_POS | SIF_RANGE | ((op.view_scroll_bar == 0) ? SIF_DISABLENOSCROLL : 0);
+		sci.nPage = bf->page_y;
+		sci.nMax = si->leg[bf->view_leg].max_round;
+		sci.nPos = bf->pos_y;
+		SetScrollInfo(hWnd, SB_VERT, &sci, TRUE);
+	} else {
+		EnableScrollBar(hWnd, SB_VERT, ESB_DISABLE_BOTH);
+
+		bf->max_y = bf->pos_y = 0;
+
+		ZeroMemory(&sci, sizeof(SCROLLINFO));
+		sci.cbSize = sizeof(SCROLLINFO);
+		sci.fMask  = SIF_POS | SIF_PAGE | SIF_RANGE | ((op.view_scroll_bar == 0) ? SIF_DISABLENOSCROLL : 0);
+		sci.nMax = 1;
+		SetScrollInfo(hWnd, SB_VERT, &sci, TRUE);
+	}
+}
 
 static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 {
@@ -360,7 +395,7 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 
 			ImmAssociateContext(hWnd, (HIMC)NULL);
 
-			// set_scrollbar(hWnd, bf, bf->si);
+			set_scrollbar(hWnd, bf, bf->si);
 
 //			bf->hedit = nedit_create(hInst, hWnd, 0);
 //			SendMessage(bf->hedit, EM_LIMITTEXT, INPUT_LIMIT, 0);
