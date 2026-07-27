@@ -302,6 +302,12 @@ static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
 		LineTo(bf->back_dc, bf->score_left[j], bf->back_height);
 	}
 
+	for (height = bf->header_height + bf->score_height -1; height < bf->back_height; height = height + bf->score_height) {
+		MoveToEx(bf->back_dc, 0, height, NULL);
+		LineTo(bf->back_dc, bf->back_width, height);
+	}
+	SelectObject(bf->back_dc, ret_pen);
+
 	return TRUE;
 }
 
