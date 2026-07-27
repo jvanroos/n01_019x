@@ -291,7 +291,7 @@ static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
 		} else {
 			message_copy_res(IDS_STRING_TO_GO, buf);
 		}
-		SetRect(&draw_rect, bf->input_left[j] + 1, 0, bf->score_right[j], bf->header_height - 1);
+		SetRect(&draw_rect, bf->score_left[j] + 1, 0, bf->score_right[j], bf->header_height - 1);
 		draw_text(bf->back_dc, buf, lstrlen(buf), &draw_rect);
 	}
 
@@ -316,8 +316,8 @@ static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
 	MoveToEx(bf->back_dc, bf->score_right[0] + 1, 0, NULL);
 	LineTo(bf->back_dc, bf->score_right[0] + 1, bf->back_height);
 
-	MoveToEx(bf->back_dc, bf->score_left[0] - 1, 0, NULL);
-	LineTo(bf->back_dc, bf->score_left[0] - 1, bf->back_height);
+	MoveToEx(bf->back_dc, bf->input_left[1] - 1, 0, NULL);
+	LineTo(bf->back_dc, bf->input_left[1] - 1, bf->back_height);
 
 	SelectObject(bf->back_dc, ret_pen);
 	return TRUE;
