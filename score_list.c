@@ -302,7 +302,7 @@ static BOOL draw_background(const DRAW_BUFFER *bf, const int first)
 		LineTo(bf->back_dc, bf->score_left[j], bf->back_height);
 	}
 
-	for (height = bf->header_height + bf->score_height -1; height < bf->back_height; height = height + bf->score_height) {
+	for (height = bf->header_height + bf->score_height - 1; height < bf->back_height; height = height + bf->score_height) {
 		MoveToEx(bf->back_dc, 0, height, NULL);
 		LineTo(bf->back_dc, bf->back_width, height);
 	}
@@ -358,6 +358,38 @@ static BOOL draw_line(DRAW_BUFFER *bf, const SCORE_INFO *si, const RECT *rect, c
 			draw_text(bf->draw_dc, buf, lstrlen(buf), &draw_rect);
 		}
 		return TRUE;
+	}
+
+	// Drawing the number
+	if (si->round_limit != 0 && round > si->leg[bf->view_leg].max_round) {
+		return TRUE;
+	}
+
+	if (si->round_limit != 0 && round > si->round - 3) {
+		SetTextColor(bf->draw_dc, op.ci.last3number_text);
+	} else {
+		SetTextColor(bf->draw_dc, op.ci.header_text);
+	}
+	SetBkColor(bf->draw_dc, op.ci.header_background);
+	if (op.view_throw_count == 0) {
+		_itot(round, buf, 10);
+	} else {
+		_itot(round * 3, buf, 10);
+	}
+	SetRect(&draw_rect, bf->score_right[0] + 2, 0, bf->input_left[1] - 2, bf->score_height - 1);
+	draw_text(bf->draw_dc, buf, lstrlen(buf), &draw_rect);
+
+	// Rendering the score
+	i = round - 1;
+	if (i > si->leg[bf->view_leg].current_round) {
+		return TRUE;
+	}
+	if (round / 2 == (round + 1) / 2) {
+		SetBkColor(bf->draw_dc, op.ci.background);
+		ret_brush = SelectObject(bf->draw_dc, bf->back_brush);
+	} else {
+		SetBkColor(bf->draw_dc, op.ci.odd_background);
+		ret_brush = SelectObject(bf->draw_dc, bf->odd_back_brush);
 	}
 	return TRUE;
 }
