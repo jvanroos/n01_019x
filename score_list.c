@@ -11,8 +11,6 @@
 #undef	_INC_OLE
 #include <tchar.h>
 
-#include <uiribbon.h>
-
 #include "general.h"
 #include "Memory.h"
 #include "String.h"
@@ -26,6 +24,11 @@
 #define WINDOW_CLASS				TEXT("score_list_wnd")
 
 #define CHAR_COUNT 					17
+
+#ifndef WM_MOUSEWHEEL
+#define WM_MOUSEWHEEL				0x020A
+#endif
+#define WHEEL_COUNT					3
 
 /* Global Variables */
 extern HINSTANCE hInst;
@@ -111,6 +114,7 @@ static BOOL draw_free(const HWND hWnd, DRAW_BUFFER *bf);
 static void draw_text(const HDC hdc, const TCHAR *str, const int len, const RECT *rect);
 static BOOL draw_background(const DRAW_BUFFER *bf, const int first);
 static BOOL draw_line(DRAW_BUFFER *bf, const SCORE_INFO *si, const RECT *rect, const int round, int *left);
+static void set_player_info(const DRAW_BUFFER *bf, SCORE_INFO *si, const int player, const int round);
 static void set_scrollbar(const HWND hWnd, DRAW_BUFFER *bf, const SCORE_INFO *si);
 static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -130,7 +134,7 @@ static void set_scrollbar(const HWND hWnd, DRAW_BUFFER *bf, const SCORE_INFO *si
 
 		ZeroMemory(&sci, sizeof(SCROLLINFO));
 		sci.cbSize = sizeof(SCROLLINFO);
-		sci.fMask  = SIF_POS | SIF_RANGE | ((op.view_scroll_bar == 0) ? SIF_DISABLENOSCROLL : 0);
+		sci.fMask  = SIF_POS | SIF_RANGE | SIF_PAGE | ((op.view_scroll_bar == 0) ? SIF_DISABLENOSCROLL : 0);
 		sci.nPage = bf->page_y;
 		sci.nMax = si->leg[bf->view_leg].max_round;
 		sci.nPos = bf->pos_y;
@@ -394,6 +398,22 @@ static BOOL draw_line(DRAW_BUFFER *bf, const SCORE_INFO *si, const RECT *rect, c
 	return TRUE;
 }
 
+static void set_player_info(const DRAW_BUFFER *bf, SCORE_INFO *si, const int player, const int round)
+{
+	int left;
+	int i, j;
+
+	if (round >= 0) {
+		j = round;
+	} else if ((si->leg[bf->view_leg].first != si->leg[bf->view_leg].current_player && 
+			si->leg[bf->view_leg].current_player == player) ||  
+			si->leg[bf->view_leg].first == si->leg[bf->view_leg].current_player) {
+		j = si->leg[bf->view_leg].current_round;
+	} else {
+		j = si->leg[bf->view_leg].current_round + 1;
+	}
+}
+
 static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	DRAW_BUFFER *bf;
@@ -528,6 +548,55 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 			EndPaint(hWnd, &ps);
 			break;
 
+		case WM_VSCROLL:
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			if(bf == NULL || bf->lock == TRUE){
+				break;
+			}
+			GetClientRect(hWnd, &rect);
+			rect.top += bf->header_height;
+			i = bf->pos_y;
+			switch((int)LOWORD(wParam)) {
+				case SB_TOP:
+					bf->pos_y = 0;
+					break;
+
+				case SB_BOTTOM:
+					bf->pos_y = bf->max_y;
+					break;
+
+				case SB_LINEDOWN:
+					bf->pos_y = (bf->pos_y < bf->max_y) ? bf->pos_y + 1 : bf->max_y;
+					break;
+
+				case SB_LINEUP:
+					bf->pos_y = (bf->pos_y > 0) ? bf->pos_y - 1 : 0;
+					break;
+
+				case SB_THUMBPOSITION:
+				case SB_THUMBTRACK:
+					{
+						SCROLLINFO sci;
+						
+						ZeroMemory(&sci, sizeof(SCROLLINFO));
+						sci.cbSize = sizeof(SCROLLINFO);
+						sci.fMask = SIF_ALL;
+						GetScrollInfo(hWnd, SB_VERT, &sci);
+						bf->pos_y, sci.nTrackPos;
+					}
+					break;
+			}
+			SetScrollPos(hWnd, SB_VERT, bf->pos_y, TRUE);
+			ScrollWindowEx(hWnd, 0, (i - bf->pos_y) * bf->score_height, NULL, &rect, NULL, NULL, SW_INVALIDATE | SW_ERASE);
+
+			break;
+
+		case WM_MOUSEWHEEL:
+			for (i = 0; i <WHEEL_COUNT; i++) {
+				SendMessage(hWnd, WM_VSCROLL, ((short)HIWORD(wParam) > 0) ? SB_LINEUP : SB_LINEDOWN, 0);
+			}
+			break;
+
 		case WM_SIZE:
 			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if(bf == NULL){
@@ -536,6 +605,10 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 			
 			draw_free(hWnd, bf);		
 			draw_init(hWnd, bf);
+			if (op.view_scroll_bar == 0) {
+				ShowScrollBar(hWnd, SB_VERT, FALSE);
+			}
+			set_scrollbar(hWnd, bf, bf->si);
 			SendMessage(hWnd, WM_SCORE_REDRAW, 0, 0);	
 			
 			break;
@@ -593,8 +666,35 @@ static LRESULT CALLBACK score_list_proc(const HWND hWnd, const UINT msg, WPARAM 
 				}
 				bf->input_x = leg.first;
 				bf->input_y = -1;
-			}
+			} else {
+				mem_free((void *)&bf->si->leg[bf->view_leg].score[0]);
+				mem_free((void *)&bf->si->leg[bf->view_leg].score[1]);
+				mem_free((void *)&bf->si->tmp_check_out[0]);
+				mem_free((void *)&bf->si->tmp_check_out[1]);
 
+				bf->si->leg[bf->view_leg] = bf->next_info.si.leg[bf->next_info.view_leg];
+				bf->next_info.si.leg[bf->next_info.view_leg].score[0] = NULL;
+				bf->next_info.si.leg[bf->next_info.view_leg].score[1] = NULL;
+				bf->si->tmp_check_out[0] = bf->next_info.si.tmp_check_out[0];
+				bf->si->tmp_check_out[1] = bf->next_info.si.tmp_check_out[1];
+				bf->next_info.si.tmp_check_out[0] = NULL;
+				bf->next_info.si.tmp_check_out[1] = NULL;
+
+				bf->si->player[0].left = bf->next_info.si.player[0].left;
+				bf->si->player[1].left = bf->next_info.si.player[1].left;
+				bf->input_x = bf->next_info.input_x;
+				bf->input_y = bf->next_info.input_y;
+
+				score_info_free(&bf->next_info.si);
+				bf->next_info.prev_flag = FALSE;
+
+				// recovery_save(bf->si, 0, 0, 0);
+				// set_player_info(bf, bf->si, 0, -1);
+				// set_player_info(bf, bf->si, 1, -1);
+				bf->pos_y = 0;
+			}
+			
+			set_scrollbar(hWnd, bf, bf->si);
 			SendMessage(hWnd, WM_SCORE_REDRAW, 0, 0);
 
 			break;
