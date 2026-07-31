@@ -90,9 +90,9 @@ static BOOL draw_score(const HWND hWnd, const DRAW_BUFFER *bf)
 		buf, len);
 
 // TO DO: remove the comments from the condition statement.
-//	if (bf->current == TRUE) {
-//		FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
-//	}
+	if (bf->current == TRUE) {
+		FillRgn(bf->draw_dc, bf->hrgn, bf->active_border_brush);
+	}
 	return TRUE;
 }
 
@@ -123,8 +123,8 @@ static BOOL draw_init(const HWND hWnd, DRAW_BUFFER *bf)
 	bf->score_font = font_create(op.font_name, bf->font_size, FW_BOLD, FALSE, FALSE);
 	bf->ret_font = SelectObject(bf->draw_dc, bf->score_font);
 
-	SetTextColor(bf->draw_dc, RGB(0, 0, 255)); // TODO: change RGB(0, 0, 255) to op.ci.left_text;
-	SetBkColor(bf->draw_dc, RGB(255, 255, 255)); // TODO: change RGB(255, 255, 255) to op.ci.left_background;
+	SetTextColor(bf->draw_dc, op.ci.left_text); // RGB(0, 0, 255)); // TODO: change RGB(0, 0, 255) to op.ci.left_text;
+	SetBkColor(bf->draw_dc, op.ci.left_background); // RGB(255, 255, 255)); // TODO: change RGB(255, 255, 255) to op.ci.left_background;
 	
 	hrgn[0] = CreateRectRgnIndirect(&rect);
 	SetRect(&del_rect, rect.bottom / BORDER_SIZE, rect.bottom / BORDER_SIZE,
@@ -174,9 +174,8 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			ReleaseDC(hWnd, hdc);
 			draw_init(hWnd, bf);
 			SetBkMode(bf->draw_dc, TRANSPARENT);
-			bf->back_brush = CreateSolidBrush(RGB(255, 255, 255));	// TODO: Nog te vervangen.
-			bf->active_border_brush = CreateSolidBrush(RGB(0, 0, 255)); // TODO: Nog te vervangen.
-			bf->pi->left = 501;	// TODO: Moet uit de GAME_INFO komen.
+			bf->back_brush = CreateSolidBrush(op.ci.left_background); 
+			bf->active_border_brush = CreateSolidBrush(op.ci.left_active_border); 
 			draw_score(hWnd, bf);
 
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)bf);
@@ -214,7 +213,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			return ret;
 		
 		case WM_LEFT_REDRAW:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
@@ -224,7 +223,7 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			break;
 
 		case WM_LEFT_DRAW_INIT:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
@@ -238,11 +237,11 @@ static LRESULT CALLBACK score_left_proc(const HWND hWnd, const UINT msg, WPARAM 
 			break;
 
 		case WM_LEFT_SET_CURRENT:
-			bf = (DRAW_BUFFER *)GetWindowLong(hWnd, GWL_USERDATA);
+			bf = (DRAW_BUFFER *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			if (bf == NULL) {
 				break;
 			}
-			// wParam contains TTUE or FALSE according to the wParam from SendMessage()
+			// wParam contains TRUE or FALSE according to the wParam from SendMessage()
 			bf->current = wParam;	
 
 			if (bf->current == TRUE) {
